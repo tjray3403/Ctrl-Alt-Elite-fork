@@ -5,6 +5,11 @@ node_modules/
 
 # Expo
 .expo/
+.expo-shared/
+.eas/
+.vscode/
+.idea/
+coverage/
 dist/
 web-build/
 expo-env.d.ts
