@@ -51,5 +51,5 @@ Join our community of developers creating universal apps.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
 =======
 # Ctrl-Alt-Elite
-For our Senior Design project 
+For our Senior Design project aka Panther Pace App
 >>>>>>> ea8daa21e50be7b3cf91d8e887103ad614ee5aa4
