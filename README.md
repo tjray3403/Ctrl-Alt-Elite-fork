@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
@@ -49,11 +48,17 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-=======
 # Ctrl-Alt-Elite
 For our Senior Design project aka Panther Pace App
+<<<<<<< HEAD
+Hello
+=======
 >>>>>>> ea8daa21e50be7b3cf91d8e887103ad614ee5aa4
 Hello
 
 Hello This Is Kel
+<<<<<<< HEAD
 Kel new commit
+=======
+>>>>>>> 2bda8ce3d441e2253fb7154cc116e62b0aa44709
+>>>>>>> 2497de15da6c072170cc6f8f79b5e4fabb510d1b
