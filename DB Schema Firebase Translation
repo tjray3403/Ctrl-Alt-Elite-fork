@@ -1,0 +1,173 @@
+Firestore Root
+│
+├── users (Collection)
+│   ├── {user_id} (Document)
+│   │   ├── first_name: "John"
+│   │   ├── last_name: "Doe"
+│   │   ├── email: "john@example.com"
+│   │   ├── password_hash: "hashed_password"
+│   │   ├── date_of_birth: "1990-01-01"
+│   │   ├── created_at: timestamp
+│   │   ├── classes (Subcollection)
+│   │   │   ├── {class_id} (Document)
+│   │   │   │   ├── class_name: "Math 101"
+│   │   │   │   ├── department: "Mathematics"
+│   │   │   │   ├── location: "Room 202"
+│   │   │   │   ├── start_time: "08:00"
+│   │   │   │   ├── end_time: "09:30"
+│   │   │   │   ├── days: "Mon, Wed, Fri"
+│   │   ├── routes (Subcollection)
+│   │   │   ├── {route_id} (Document)
+│   │   │   │   ├── start_location: "Library"
+│   │   │   │   ├── end_location: "Gym"
+│   │   │   │   ├── estimated_time: 15
+│   │   │   │   ├── weather_condition: "Sunny"
+│   │   │   │   ├── route_details: "Take Main St."
+│   │   │   │   ├── created_at: timestamp
+│   │   ├── health_data (Subcollection)
+│   │   │   ├── {health_id} (Document)
+│   │   │   │   ├── date: "2024-04-22"
+│   │   │   │   ├── steps: 8000
+│   │   │   │   ├── sleep_hours: 7.5
+│   │   │   │   ├── calories_burned: 400
+│   │   │   │   ├── mood: "Happy"
+│   │   ├── recommendations (Subcollection)
+│   │   │   ├── {rec_id} (Document)
+│   │   │   │   ├── recommendation_text: "Stay hydrated"
+│   │   │   │   ├── category: "Health"
+│   │   │   │   ├── created_at: timestamp
+│   │   ├── api_logs (Subcollection)
+│   │   │   ├── {log_id} (Document)
+│   │   │   │   ├── api_name: "Google Maps"
+│   │   │   │   ├── request_time: timestamp
+│   │   │   │   ├── response_status: "Success"
+│   │   ├── user_settings (Document)
+│   │   │   ├── receive_notifications: true
+│   │   │   ├── data_sharing: true
+│   │   │   ├── theme_preference: "dark"
+
+
+###################################################EXPLANAITON
+2. Firestore Implementation for Each Table
+1. users Collection
+Each user has a document inside the users collection.
+The user_id is the document ID (Firestore auto-generates unique IDs).
+Example Firestore Document:
+json
+Copy
+Edit
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john@example.com",
+  "password_hash": "hashed_password",
+  "date_of_birth": "1990-01-01",
+  "created_at": "2024-04-22T10:00:00Z"
+}
+2. classes Subcollection
+Instead of a separate classes table, we store classes as a subcollection under each user.
+Example Firestore Document in /users/{user_id}/classes/{class_id}
+json
+Copy
+Edit
+{
+  "class_name": "Math 101",
+  "department": "Mathematics",
+  "location": "Room 202",
+  "start_time": "08:00",
+  "end_time": "09:30",
+  "days": "Mon,Wed,Fri"
+}
+3. routes Subcollection
+Each user has their own routes subcollection.
+Example Firestore Document in /users/{user_id}/routes/{route_id}
+json
+Copy
+Edit
+{
+  "start_location": "Library",
+  "end_location": "Gym",
+  "estimated_time": 15,
+  "weather_condition": "Sunny",
+  "route_details": "Take Main St.",
+  "created_at": "2024-04-22T10:05:00Z"
+}
+4. health_data Subcollection
+Health metrics are stored per user in the health_data subcollection.
+Example Firestore Document in /users/{user_id}/health_data/{health_id}
+json
+Copy
+Edit
+{
+  "date": "2024-04-22",
+  "steps": 8000,
+  "sleep_hours": 7.5,
+  "calories_burned": 400,
+  "mood": "Happy"
+}
+5. recommendations Subcollection
+Stores personalized recommendations per user.
+Example Firestore Document in /users/{user_id}/recommendations/{rec_id}
+json
+Copy
+Edit
+{
+  "recommendation_text": "Stay hydrated",
+  "category": "Health",
+  "created_at": "2024-04-22T11:00:00Z"
+}
+6. api_logs Subcollection
+Stores logs of third-party API calls per user.
+Example Firestore Document in /users/{user_id}/api_logs/{log_id}
+json
+Copy
+Edit
+{
+  "api_name": "Google Maps",
+  "request_time": "2024-04-22T12:00:00Z",
+  "response_status": "Success"
+}
+7. user_settings Document
+Each user has one settings document.
+Example Firestore Document in /users/{user_id}/user_settings
+json
+Copy
+Edit
+{
+  "receive_notifications": true,
+  "data_sharing": true,
+  "theme_preference": "dark"
+}
+3. Firestore Queries
+1. Get a User’s Classes
+javascript
+Copy
+Edit
+const userId = "123";  // Firestore document ID
+const classesRef = db.collection("users").doc(userId).collection("classes");
+
+classesRef.get().then(snapshot => {
+  snapshot.forEach(doc => console.log(doc.data()));
+});
+2. Add a New Route
+javascript
+Copy
+Edit
+const routeRef = db.collection("users").doc(userId).collection("routes").doc();
+routeRef.set({
+  start_location: "Library",
+  end_location: "Gym",
+  estimated_time: 15,
+  weather_condition: "Sunny",
+  route_details: "Take Main St.",
+  created_at: new Date()
+});
+4. Why This Firestore Design?
+✅ Scalable: Users can have unlimited classes, routes, logs, etc.
+✅ Faster Queries: Data is grouped by user, so fetching all user-related info is efficient.
+✅ NoSQL-Friendly: Firestore avoids complex joins by using subcollections.
+
+Final Thoughts
+SQL → NoSQL conversion requires thinking in terms of documents & subcollections.
+Firebase Firestore is schema-less, but using structured subcollections helps mimic SQL relations.
+You can still enforce data validation rules using Firestore security rules.
