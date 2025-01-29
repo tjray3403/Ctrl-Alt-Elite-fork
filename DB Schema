@@ -1,0 +1,103 @@
+Tables and Schema
+#################################################################################
+1. users
+Stores user account information.
+
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    date_of_birth DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+#################################################################################
+2. classes
+Stores class schedule information.
+
+CREATE TABLE classes (
+    class_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    class_name VARCHAR(100),
+    department VARCHAR(50),
+    location VARCHAR(100),
+    start_time TIME,
+    end_time TIME,
+    days VARCHAR(20), -- e.g., 'Mon,Wed,Fri'
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+#################################################################################
+3. routes
+Stores campus route planning details.
+
+CREATE TABLE routes (
+    route_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    start_location VARCHAR(255),
+    end_location VARCHAR(255),
+    estimated_time INT, -- in minutes
+    weather_condition VARCHAR(50),
+    route_details TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+#################################################################################
+4. health_data
+Stores user health metrics such as steps, sleep, and other wellness data.
+
+CREATE TABLE health_data (
+    health_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    date DATE NOT NULL,
+    steps INT DEFAULT 0,
+    sleep_hours FLOAT DEFAULT 0.0,
+    calories_burned INT DEFAULT 0,
+    mood VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+#################################################################################
+5. recommendations
+Stores personalized wellness tips.
+
+CREATE TABLE recommendations (
+    rec_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    recommendation_text TEXT,
+    category VARCHAR(50), -- e.g., 'Fitness', 'Nutrition', 'Mental Health'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+#################################################################################
+6. api_logs
+Tracks third-party API usage (Google Maps, Weather API).
+
+CREATE TABLE api_logs (
+    log_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    api_name VARCHAR(100),
+    request_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    response_status VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+#################################################################################
+7. user_settings
+Stores user preferences for notifications and privacy settings.
+
+CREATE TABLE user_settings (
+    setting_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    receive_notifications BOOLEAN DEFAULT TRUE,
+    data_sharing BOOLEAN DEFAULT TRUE,
+    theme_preference VARCHAR(20) DEFAULT 'light',
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+#################################################################################
+Key Features Covered by Schema
+✅ User Management → users
+✅ Class Information Tracking → classes
+✅ Route Planning → routes
+✅ Health Data Tracking → health_data
+✅ Recommendation System → recommendations
+✅ Third-Party API Integration → api_logs
+✅ User Preferences & Privacy → user_settings
