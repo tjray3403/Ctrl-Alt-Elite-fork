@@ -13,8 +13,8 @@ import { db } from "@/config/firebase"; // Firestore DB instance
 export default function HomeScreen() {
   const [userId, setUserId] = useState<string | null>(null);
   const [firestoreData, setFirestoreData] = useState<any[]>([]);
-
-  // Authenticate user anonymously on mount
+//Auth needs to be set up on Firebase
+  // Authenticate user anonymously on mount 
   useEffect(() => {
     const authenticateUser = async () => {
       try {
@@ -56,8 +56,15 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Welcome Anonymous User ID: {userId}!</ThemedText>
         <HelloWave />
+        <ul>
+        {firestoreData.map(item => (
+          <li key={item.id}>
+            {JSON.stringify(item)}
+          </li>
+        ))}
+      </ul>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
