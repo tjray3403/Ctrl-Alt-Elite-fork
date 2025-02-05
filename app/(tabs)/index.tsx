@@ -1,11 +1,51 @@
 import { Image, StyleSheet, Platform } from 'react-native';
-
+import { useEffect, useState } from "react";
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
+import { auth } from "@/config/firebase";
+import { signInAnonymously } from "firebase/auth";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/config/firebase"; // Firestore DB instance
+
 export default function HomeScreen() {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [firestoreData, setFirestoreData] = useState<any[]>([]);
+
+  // Authenticate user anonymously on mount
+  useEffect(() => {
+    const authenticateUser = async () => {
+      try {
+        const userCredential = await signInAnonymously(auth);
+        setUserId(userCredential.user.uid);
+        console.log("✅ Firebase Auth Connected - User ID:", userCredential.user.uid);
+      } catch (error) {
+        console.error("❌ Firebase Auth Error:", (error as Error).message);
+      }
+    };
+
+    authenticateUser();
+  }, []);
+
+  // Fetch Firestore data
+  useEffect(() => {
+    const fetchFirestoreData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "testCollection"));
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setFirestoreData(data);
+        console.log("✅ Firestore Data:", data);
+      } catch (error) {
+        console.error("❌ Firestore Error:", (error as Error).message);
+      }
+    };
+
+    fetchFirestoreData();
+  }, []);
+
+  
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
