@@ -1,31 +1,40 @@
+import { View, Text } from 'react-native'
+import React from 'react'
+import { Tabs } from 'expo-router'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Tabs } from 'expo-router';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={"black"} />,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
-        }}
-      />
-       <Tabs.Screen
-        name="Reccomendations"
-        options={{
-          title: 'Reccomendations',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
-        }}
-      />
-   
+    <Tabs screenOptions={{
+        headerShown:false
+    }}>
+        
+        <Tabs.Screen name='map'
+            options={{
+                tabBarIcon:({color,size})=>(
+                    <FontAwesome5 name="map-marker-alt" size={24} color="black" />
+                )
+            }}/>
+        <Tabs.Screen name='index' 
+            options={{
+                tabBarIcon:({color,size})=>(
+                    <FontAwesome name="home" size={24} color="black" />
+                )
+            }}/>
+        <Tabs.Screen name='profile'
+            options={{
+                tabBarIcon:({color,size})=>(
+                    <FontAwesome name="user" size={24} color="black" />
+                )
+            }}/>
+        <Tabs.Screen name='recommendations'
+            options={{
+                tabBarIcon:({color,size})=>(
+                    <FontAwesome name="smile-o" size={24} color="black" />
+                )
+            }}/>
     </Tabs>
-  );
+  )
 }
