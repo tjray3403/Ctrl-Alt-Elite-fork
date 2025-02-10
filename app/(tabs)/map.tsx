@@ -1,10 +1,19 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+//import React, { useState, setState } from 'react'
 
-export default function map() {
+
+
+export default function HomeScreen() {
+  /*const [number, setNumber] = useState(0)
+  const Fr = () => {
+    return setState(1)
+  }*/
   return (
     <View>
-      <Text>map</Text><Text></Text>
+      <Text>Map hiiiiii
+        
+      </Text>
+      <Text> HIII</Text>
     </View>
   )
 }
