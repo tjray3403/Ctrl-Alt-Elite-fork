@@ -4,7 +4,7 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-
+ 
 import { auth } from "@/config/firebase";
 import { signInAnonymously } from "firebase/auth";
 import { collection, getDocs } from "firebase/firestore";
