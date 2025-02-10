@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 //import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 // firebase.js
 //import { initializeApp } from "firebase/app";
 //import { getFirestore } from "firebase/firestore"; // For Firestore
@@ -65,7 +65,16 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 console.log("🔥 Firebase Initialized:", app.name);
+/*const testFirestoreConnection = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "testCollection"));
+    console.log("✅ Firestore Connection Successful - Documents Found:", querySnapshot.size);
+  } catch (error) {
+    console.error("❌ Firestore Connection Failed:", error);
+  }
+};
 
+testFirestoreConnection();*/
 // Export the initialized app
 export { auth, db,};
 export default app;

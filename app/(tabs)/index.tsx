@@ -13,9 +13,22 @@ import { db } from "@/config/firebase"; // Firestore DB instance
 export default function HomeScreen() {
   const [userId, setUserId] = useState<string | null>(null);
   const [firestoreData, setFirestoreData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const checkFirestore = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "testCollection"));
+        console.log("✅ Firestore Connected - Documents Found:", querySnapshot.size);
+      } catch (error) {
+        console.error("❌ Firestore Error:", error);
+      }
+    };
+
+    checkFirestore();
+  }, []);
 //Auth needs to be set up on Firebase
   // Authenticate user anonymously on mount 
-  useEffect(() => {
+ /* useEffect(() => {
     const authenticateUser = async () => {
       try {
         const userCredential = await signInAnonymously(auth);
@@ -25,7 +38,7 @@ export default function HomeScreen() {
         console.error("❌ Firebase Auth Error:", (error as Error).message);
       }
     };
-
+//Most firebase auth related stuff wont work until it's set up on "console.firebase.google.com"
     authenticateUser();
   }, []);
 
@@ -43,7 +56,7 @@ export default function HomeScreen() {
     };
 
     fetchFirestoreData();
-  }, []);
+  }, []);*/
 
   
   return (
