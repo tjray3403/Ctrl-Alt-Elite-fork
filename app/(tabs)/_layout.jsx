@@ -1,14 +1,40 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import { Tabs } from 'expo-router'
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+
 
 export default function TabLayout() {
   return (
-    <Tabs>
-        <Tabs.Screen name='index' />
-        <Tabs.Screen name='map'/>
-        <Tabs.Screen name='profile'/>
-        <Tabs.Screen name='recommendations'/>
+    <Tabs screenOptions={{
+        headerShown:false
+    }}>
+        
+        <Tabs.Screen name='map'
+            options={{
+                tabBarIcon:({color,size})=>(
+                    <FontAwesome5 name="map-marker-alt" size={24} color="black" />
+                )
+            }}/>
+        <Tabs.Screen name='index' 
+            options={{
+                tabBarIcon:({color,size})=>(
+                    <FontAwesome name="home" size={24} color="black" />
+                )
+            }}/>
+        <Tabs.Screen name='profile'
+            options={{
+                tabBarIcon:({color,size})=>(
+                    <FontAwesome name="user" size={24} color="black" />
+                )
+            }}/>
+        <Tabs.Screen name='recommendations'
+            options={{
+                tabBarIcon:({color,size})=>(
+                    <FontAwesome name="smile-o" size={24} color="black" />
+                )
+            }}/>
     </Tabs>
   )
 }
