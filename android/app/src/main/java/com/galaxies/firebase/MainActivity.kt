@@ -1,4 +1,4 @@
-package com.anonymous.PantherPace
+package com.galaxies.firebase
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

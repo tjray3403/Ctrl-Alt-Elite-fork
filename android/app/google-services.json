@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "835884258653",
+    "project_id": "pantherpace-2ea08",
+    "storage_bucket": "pantherpace-2ea08.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835884258653:android:58da326a77f2a08fc5c4b4",
+        "android_client_info": {
+          "package_name": "com.ctrlaltelite.pantherpace"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxoAYoLnOTaaPOeRoIj1Fbo5wEgHA2DZg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
