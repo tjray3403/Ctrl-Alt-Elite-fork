@@ -1,22 +1,39 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 
 export default function Profile() {
+  // Floating Animation Effect
+  const glowOpacity = useSharedValue(0.5);
+  useEffect(() => {
+    glowOpacity.value = withRepeat(
+      withTiming(1, { duration: 2000, easing: Easing.ease }),
+      -1, // Infinite loop
+      true // Reverse animation
+    );
+  }, []);
+
+  const glowingStyle = useAnimatedStyle(() => ({
+    opacity: glowOpacity.value,
+  }));
+
   return (
     <View style={styles.container}>
       <View style={styles.profileCard}>
-        {/* Profile Picture */}
-        <Image 
-          source={require('../../assets/images/kopp.jpeg')} 
-          style={styles.profileImage}
-        />
+        {/* Glowing Animated Profile Image */}
+        <Animated.View style={[styles.imageContainer, glowingStyle]}>
+          <Image 
+            source={require('../../assets/images/kopp.jpeg')} 
+            style={styles.profileImage}
+          />
+        </Animated.View>
         
         {/* Name */}
-        <Text style={styles.name}>Kel Onyewuenyi</Text>
+        <Text style={styles.name}>John Doe</Text>
 
         {/* Age and Weight */}
-        <Text style={styles.info}>Age: 25</Text>
-        <Text style={styles.info}>Weight: 175 lbs</Text>
+        <Text style={styles.info}>Age: 28</Text>
+        <Text style={styles.info}>Weight: 180 lbs</Text>
 
         {/* Buttons */}
         <View style={styles.buttonContainer}>
@@ -37,38 +54,51 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#3b5998',
+    backgroundColor: '#0f172a', // Dark futuristic background
     paddingHorizontal: 20,
   },
   profileCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     padding: 30,
     borderRadius: 20,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: '#00eaff',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 8,
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+    elevation: 12,
     width: '90%',
+    borderWidth: 2,
+    borderColor: '#00eaff',
+  },
+  imageContainer: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#00eaff33', // Subtle glow effect
+    padding: 8,
   },
   profileImage: {
-    width: 150, // Increased size
-    height: 150, // Increased size
-    borderRadius: 75,
-    marginBottom: 15,
-    borderWidth: 4,
-    borderColor: '#4c669f',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    borderWidth: 3,
+    borderColor: '#00eaff',
   },
   name: {
-    fontSize: 28, // Larger name
+    fontSize: 32, // Larger futuristic font
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    color: '#00eaff',
+    marginTop: 10,
+    textShadowColor: '#0088ff',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 10,
   },
   info: {
-    fontSize: 20, // Larger age & weight
-    color: '#555',
+    fontSize: 20,
+    color: '#9ccaff',
     marginBottom: 5,
   },
   buttonContainer: {
@@ -77,21 +107,26 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   button: {
-    backgroundColor: '#4c669f',
+    backgroundColor: '#00eaff',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 10,
+    shadowColor: '#00eaff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 8,
   },
   activityButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#ff007f',
   },
   buttonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 18,
     fontWeight: 'bold',
+    textTransform: 'uppercase',
   },
   activityText: {
     color: '#fff',
   },
 });
-
