@@ -7,7 +7,7 @@ export default function Profile() {
     <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']} style={styles.container}>
       <View style={styles.profileCard}>
         <Image 
-          source={require('../assets/images/kopp.jpeg')} // Replace with user's profile image URL
+          source={require('../../assets/images/kopp.jpeg')} // Replace with user's profile image URL
           style={styles.profileImage}
         />
         <Text style={styles.name}>Sansta C.</Text>
