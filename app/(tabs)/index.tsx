@@ -10,7 +10,7 @@ export default function HomeScreen() {
   }*/
   return (
     <View>
-      <Text>HomeScreen</Text>
+      <Text>HomeScreen Hello Panther Pace</Text>
     </View>
   )
 }
