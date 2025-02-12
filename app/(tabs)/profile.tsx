@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0f172a', // Dark futuristic background
+    backgroundColor: '#0a0a0a', // Dark futuristic background
     paddingHorizontal: 20,
   },
   profileCard: {
@@ -62,14 +62,14 @@ const styles = StyleSheet.create({
     padding: 30,
     borderRadius: 20,
     alignItems: 'center',
-    shadowColor: '#00eaff',
+    shadowColor: '#ff0000', // Red glow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 15,
     elevation: 12,
     width: '90%',
     borderWidth: 2,
-    borderColor: '#00eaff',
+    borderColor: '#ff0000', // Red border
   },
   imageContainer: {
     width: 160,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     borderRadius: 80,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#00eaff33', // Subtle glow effect
+    backgroundColor: '#ff000033', // Subtle red glow effect
     padding: 8,
   },
   profileImage: {
@@ -85,20 +85,20 @@ const styles = StyleSheet.create({
     height: 140,
     borderRadius: 70,
     borderWidth: 3,
-    borderColor: '#00eaff',
+    borderColor: '#ff0000', // Red border for profile pic
   },
   name: {
     fontSize: 32, // Larger futuristic font
     fontWeight: 'bold',
-    color: '#00eaff',
+    color: '#ff0000', // Red neon name
     marginTop: 10,
-    textShadowColor: '#0088ff',
+    textShadowColor: '#ff2222',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 10,
   },
   info: {
     fontSize: 20,
-    color: '#9ccaff',
+    color: '#ff6666', // Slightly lighter red for text
     marginBottom: 5,
   },
   buttonContainer: {
@@ -107,18 +107,18 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   button: {
-    backgroundColor: '#00eaff',
+    backgroundColor: '#ff0000',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 10,
-    shadowColor: '#00eaff',
+    shadowColor: '#ff0000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
     shadowRadius: 10,
     elevation: 8,
   },
   activityButton: {
-    backgroundColor: '#ff007f',
+    backgroundColor: '#990000', // Darker red for secondary button
   },
   buttonText: {
     color: '#000',
