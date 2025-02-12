@@ -10,7 +10,7 @@ export default function Profile() {
           source={{ uri: 'https://via.placeholder.com/100' }} // Replace with user's profile image URL
           style={styles.profileImage}
         />
-        <Text style={styles.name}>John Doe</Text>
+        <Text style={styles.name}>Sansta C.</Text>
         <Text style={styles.bio}>
           Passionate about fitness and web development. Always learning new things!
         </Text>
