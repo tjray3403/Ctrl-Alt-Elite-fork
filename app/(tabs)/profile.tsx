@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from "react-native-reanimated";
-import { db } from "../firebase"; // Adjust path if needed
+import { db } from "../../config/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 export default function Profile() {
