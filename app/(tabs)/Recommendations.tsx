@@ -8,8 +8,8 @@ const ActivitySuggestion = () => {
 
   const getSuggestion = async () => {
     try {
-      const response = await axios.post('http://your-api-endpoint.com/suggest', { mood });
-      setSuggestion(response.data.suggestion);
+      const response = await axios.post('http://127.0.0.1:8080/suggest', { mood }); 
+      setSuggestion(response.data.suggested_activity);
     } catch (error) {
       console.error(error);
       setSuggestion("Error fetching suggestion.");
