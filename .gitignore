@@ -42,3 +42,4 @@ yarn-error.*
 
 app-example
 backend/firebase_key.json
+/datasets
