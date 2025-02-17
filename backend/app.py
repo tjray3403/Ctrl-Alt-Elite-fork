@@ -5,7 +5,7 @@ from firebase_admin import credentials, firestore
 from pydantic import BaseModel
 
 # Initialize Firebase
-cred = credentials.Certificate("backend/firebase_key.json")  # Adjust path if needed
+cred = credentials.Certificate("./firebase_key.json")  # Adjust path if needed
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
