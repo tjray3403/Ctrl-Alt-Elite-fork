@@ -1,58 +1,72 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from "react-native-reanimated";
+import { getAuth, signOut, sendPasswordResetEmail } from "firebase/auth";
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { useRouter } from "expo-router";
 import { db } from "../../config/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
+WebBrowser.maybeCompleteAuthSession();
+
 export default function Profile() {
-  const userId = "user_123"; // Replace this with dynamic user authentication
-  const [user, setUser] = useState({ name: "", age: "", weight: "" });
+  const auth = getAuth();
+  const router = useRouter();
+  const user = auth.currentUser;
+  const userId = user?.uid;
+  const [userData, setUserData] = useState({ name: "", age: "", weight: "" });
   const [editing, setEditing] = useState(false);
   const [newName, setNewName] = useState("");
   const [newAge, setNewAge] = useState("");
   const [newWeight, setNewWeight] = useState("");
 
-  // Animation Effect
-  const glowOpacity = useSharedValue(0.5);
-  useEffect(() => {
-    glowOpacity.value = withRepeat(withTiming(1, { duration: 2000, easing: Easing.ease }), -1, true);
-  }, []);
+  // Google Sign-In
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: "YOUR_ANDROID_CLIENT_ID",
+    iosClientId: "YOUR_IOS_CLIENT_ID",
+    expoClientId: "YOUR_EXPO_CLIENT_ID",
+  });
 
-  const glowingStyle = useAnimatedStyle(() => ({
-    opacity: glowOpacity.value,
-  }));
-
-  // 🔹 Fetch User Data from Firestore
   useEffect(() => {
+    if (response?.type === "success") {
+      console.log("✅ Google Sign-In Successful!", response);
+      router.replace("/index");
+    }
+  }, [response]);
+
+  useEffect(() => {
+    if (!userId) {
+      router.replace("/login");
+      return;
+    }
+
     const fetchUser = async () => {
       const docRef = doc(db, "users", userId);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        setUser(docSnap.data());
+        setUserData(docSnap.data());
         setNewName(docSnap.data().name);
         setNewAge(docSnap.data().age.toString());
         setNewWeight(docSnap.data().weight.toString());
-      } else {
-        console.log("❌ No such user found!");
       }
     };
 
     fetchUser();
-  }, []);
+  }, [userId]);
 
-  // 🔹 Update User Data in Firestore
   const updateUser = async () => {
+    if (!userId) return;
     const docRef = doc(db, "users", userId);
 
     try {
       await updateDoc(docRef, {
-        name: newName,
-        age: parseInt(newAge),
-        weight: parseInt(newWeight),
+        name: newName || userData.name,
+        age: parseInt(newAge) || userData.age,
+        weight: parseInt(newWeight) || userData.weight,
       });
 
-      setUser({ name: newName, age: newAge, weight: newWeight });
+      setUserData({ name: newName, age: newAge, weight: newWeight });
       setEditing(false);
       Alert.alert("✅ Profile Updated Successfully!");
     } catch (error) {
@@ -60,127 +74,52 @@ export default function Profile() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      Alert.alert("✅ Logged Out", "You have been logged out successfully.");
+      router.replace("/login");
+    } catch (error) {
+      Alert.alert("❌ Error", "Failed to log out. Try again.");
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!auth.currentUser) {
+      Alert.alert("❌ Error", "You must be logged in to reset your password.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, auth.currentUser.email);
+      Alert.alert("📩 Check Your Email", "A password reset link has been sent.");
+    } catch (error) {
+      Alert.alert("❌ Error", "Failed to send reset link.");
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.profileCard}>
-        {/* Glowing Animated Profile Image */}
-        <Animated.View style={[styles.imageContainer, glowingStyle]}>
-          <Image source={require("../../assets/images/kopp.jpeg")} style={styles.profileImage} />
-        </Animated.View>
+      <Text>{userData.name || "Loading..."}</Text>
+      {editing ? (
+        <>
+          <TextInput value={newName} onChangeText={setNewName} placeholder="Enter Name" />
+          <TextInput value={newAge} onChangeText={setNewAge} keyboardType="numeric" placeholder="Enter Age" />
+          <TextInput value={newWeight} onChangeText={setNewWeight} keyboardType="numeric" placeholder="Enter Weight" />
+        </>
+      ) : (
+        <>
+          <Text>Age: {userData.age || "--"}</Text>
+          <Text>Weight: {userData.weight || "--"} lbs</Text>
+        </>
+      )}
 
-        {/* User Info - Editable */}
-        {editing ? (
-          <>
-            <TextInput style={styles.input} value={newName} onChangeText={setNewName} placeholder="Enter Name" />
-            <TextInput style={styles.input} value={newAge} onChangeText={setNewAge} keyboardType="numeric" placeholder="Enter Age" />
-            <TextInput style={styles.input} value={newWeight} onChangeText={setNewWeight} keyboardType="numeric" placeholder="Enter Weight" />
-          </>
-        ) : (
-          <>
-            <Text style={styles.name}>{user.name || "Loading..."}</Text>
-            <Text style={styles.info}>Age: {user.age || "--"}</Text>
-            <Text style={styles.info}>Weight: {user.weight || "--"} lbs</Text>
-          </>
-        )}
-
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
-          {editing ? (
-            <TouchableOpacity style={styles.button} onPress={updateUser}>
-              <Text style={styles.buttonText}>Save</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.button} onPress={() => setEditing(true)}>
-              <Text style={styles.buttonText}>Edit Profile</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity style={[styles.button, styles.activityButton]}>
-            <Text style={[styles.buttonText, styles.activityText]}>My Activity</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <TouchableOpacity onPress={updateUser}><Text>Save</Text></TouchableOpacity>
+      <TouchableOpacity onPress={handleLogout}><Text>Logout</Text></TouchableOpacity>
+      <TouchableOpacity onPress={() => promptAsync()}><Text>Sign in with Google</Text></TouchableOpacity>
+      <TouchableOpacity onPress={handlePasswordReset}><Text>Reset Password</Text></TouchableOpacity>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#0a0a0a",
-    paddingHorizontal: 20,
-  },
-  profileCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    padding: 30,
-    borderRadius: 20,
-    alignItems: "center",
-    shadowColor: "#ff0000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 12,
-    width: "90%",
-    borderWidth: 2,
-    borderColor: "#ff0000",
-  },
-  profileImage: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    borderWidth: 3,
-    borderColor: "#ff0000",
-  },
-  name: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#ff0000",
-    marginTop: 10,
-    textShadowColor: "#ff2222",
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 10,
-  },
-  info: {
-    fontSize: 20,
-    color: "#ff6666",
-    marginBottom: 5,
-  },
-  input: {
-    fontSize: 18,
-    backgroundColor: "#fff",
-    padding: 10,
-    width: "80%",
-    borderRadius: 8,
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginTop: 20,
-    gap: 12,
-  },
-  button: {
-    backgroundColor: "#ff0000",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    shadowColor: "#ff0000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  activityButton: {
-    backgroundColor: "#990000",
-  },
-  buttonText: {
-    color: "#000",
-    fontSize: 18,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-  },
-  activityText: {
-    color: "#fff",
-  },
-});
+const styles = StyleSheet.create({ container: { flex: 1, justifyContent: "center", alignItems: "center" } });
