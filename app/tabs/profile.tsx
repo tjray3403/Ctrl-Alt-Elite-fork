@@ -7,7 +7,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { styles } from "../../config/styles";
 
 export default function ProfileScreen() {
-  const auth = getAuth();
+  const auth = getAuth();   
   const router = useRouter();
   const user = auth.currentUser;
   const userId = user?.uid;
