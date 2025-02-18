@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, Image } from "react-native";
 import { getAuth, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { useRouter } from "expo-router";
 import { db } from "../../config/firebase";
@@ -7,15 +7,22 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { styles } from "../../config/styles";
 
 export default function ProfileScreen() {
-  const auth = getAuth();   
+  const auth = getAuth();
   const router = useRouter();
   const user = auth.currentUser;
   const userId = user?.uid;
 
-  const [userData, setUserData] = useState({ name: "" });
+  const [userData, setUserData] = useState({ name: "", dob: "", weight: "" });
+
+  // State for updating info
   const [newName, setNewName] = useState("");
-  const [currentPassword, setCurrentPassword] = useState(""); // ✅ For re-authentication
-  const [newPassword, setNewPassword] = useState(""); // ✅ New password
+  const [newDOB, setNewDOB] = useState("");
+  const [newWeight, setNewWeight] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  // Toggle for showing the Edit Profile section
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (!userId) {
@@ -43,18 +50,30 @@ export default function ProfileScreen() {
     if (!userId) return;
     const docRef = doc(db, "users", userId);
 
-    await updateDoc(docRef, { name: newName || userData.name });
-    setUserData((prev) => ({ ...prev, name: newName }));
-    setNewName("");
-    Alert.alert("✅ Profile Updated!");
+    try {
+      await updateDoc(docRef, {
+        name: newName || userData.name,
+        dob: newDOB || userData.dob,
+        weight: newWeight || userData.weight,
+      });
+
+      setUserData({
+        name: newName || userData.name,
+        dob: newDOB || userData.dob,
+        weight: newWeight || userData.weight,
+      });
+
+      setNewName("");
+      setNewDOB("");
+      setNewWeight("");
+
+      Alert.alert("✅ Profile Updated!", "Your information has been saved.");
+    } catch (error) {
+      console.error("❌ Firestore Update Error:", error);
+      Alert.alert("❌ Update Failed", error.message);
+    }
   };
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    router.replace("/auth/login");
-  };
-
-  // ✅ Function to Update Password
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword) {
       Alert.alert("❌ Error", "Please enter both current and new password.");
@@ -62,65 +81,94 @@ export default function ProfileScreen() {
     }
 
     try {
-      // Step 1: Re-authenticate the user
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
       await reauthenticateWithCredential(user, credential);
-      console.log("✅ Re-authenticated successfully!");
-
-      // Step 2: Update the password in Firebase Authentication
       await updatePassword(user, newPassword);
-      console.log("✅ Password updated successfully!");
 
-      // Clear input fields
       setCurrentPassword("");
       setNewPassword("");
 
       Alert.alert("✅ Success", "Your password has been updated.");
     } catch (error) {
       console.error("❌ Password Update Error:", error);
-
-      if (error.code === "auth/wrong-password") {
-        Alert.alert("❌ Error", "Incorrect current password.");
-      } else {
-        Alert.alert("❌ Error", error.message);
-      }
+      Alert.alert("❌ Error", error.code === "auth/wrong-password" ? "Incorrect current password." : error.message);
     }
   };
 
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.replace("/auth/login");
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
-      <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>Name: {userData.name || "Loading..."}</Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        {/* Profile View */}
+        {!isEditing ? (
+          <>
+            <Image source={{ uri: "https://via.placeholder.com/150" }} style={styles.profileImage} />
+            <Text style={styles.profileName}>{userData.name || "User"}</Text>
+            <Text style={styles.profileInfo}>🎂 Age: {userData.dob || "--"}</Text>
+            <Text style={styles.profileInfo}>⚖ Weight: {userData.weight || "--"} lbs</Text>
 
-      {/* Update Name */}
-      <TextInput style={styles.input} value={newName} onChangeText={setNewName} placeholder="Enter New Name" />
-      <TouchableOpacity onPress={updateUser} style={styles.button}>
-        <Text style={styles.buttonText}>Update Profile</Text>
-      </TouchableOpacity>
+            <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.primaryButton}>
+              <Text style={styles.buttonText}>Edit Profile</Text>
+            </TouchableOpacity>
 
-      {/* Update Password */}
-      <TextInput
-        style={styles.input}
-        placeholder="Current Password"
-        secureTextEntry
-        value={currentPassword}
-        onChangeText={setCurrentPassword}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="New Password"
-        secureTextEntry
-        value={newPassword}
-        onChangeText={setNewPassword}
-      />
-      <TouchableOpacity onPress={handleChangePassword} style={styles.secondaryButton}>
-        <Text style={styles.buttonText}>Update Password</Text>
-      </TouchableOpacity>
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+              <Text style={styles.buttonText}>Logout</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            {/* Edit Profile View */}
+            <Text style={styles.title}>Edit Profile</Text>
 
-      {/* Logout Button */}
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
-    </View>
+            {/* Update Name */}
+            <TextInput style={styles.input} value={newName} onChangeText={setNewName} placeholder="Enter New Name" />
+
+            {/* Update DOB */}
+            <TextInput style={styles.input} value={newDOB} onChangeText={setNewDOB} placeholder="Enter Date of Birth (YYYY-MM-DD)" />
+
+            {/* Update Weight */}
+            <TextInput
+              style={styles.input}
+              value={newWeight}
+              onChangeText={setNewWeight}
+              placeholder="Enter Weight (lbs)"
+              keyboardType="numeric"
+            />
+
+            <TouchableOpacity onPress={updateUser} style={styles.primaryButton}>
+              <Text style={styles.buttonText}>Save Changes</Text>
+            </TouchableOpacity>
+
+            {/* Update Password */}
+            <TextInput
+              style={styles.input}
+              placeholder="Current Password"
+              secureTextEntry
+              value={currentPassword}
+              onChangeText={setCurrentPassword}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="New Password"
+              secureTextEntry
+              value={newPassword}
+              onChangeText={setNewPassword}
+            />
+
+            <TouchableOpacity onPress={handleChangePassword} style={styles.secondaryButton}>
+              <Text style={styles.buttonText}>Update Password</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setIsEditing(false)} style={styles.logoutButton}>
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+    </ScrollView>
   );
 }

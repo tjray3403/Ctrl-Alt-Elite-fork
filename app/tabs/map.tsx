@@ -1,10 +1,16 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { styles } from "../../config/styles";
 
-export default function map() {
+export default function MapScreen() {
   return (
-    <View>
-      <Text>map</Text><Text></Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>🗺 Map</Text>
+      <Text style={styles.profileInfo}>Find gyms and running tracks near you.</Text>
+
+      <TouchableOpacity style={styles.primaryButton}>
+        <Text style={styles.buttonText}>View Nearby Locations</Text>
+      </TouchableOpacity>
     </View>
-  )
+  );
 }
