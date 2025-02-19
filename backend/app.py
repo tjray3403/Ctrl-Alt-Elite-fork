@@ -10,13 +10,10 @@ from fastapi.middleware.cors import CORSMiddleware
 # Load your model & data
 ############################
 
-# 1. Load spaCy model
-nlp = spacy.load("en_core_web_md")  # or en_core_web_lg
+nlp = spacy.load("en_core_web_md")
 
-# 2. Load your CSV of mood→activity
 df_moods = pd.read_csv("./mood_activity.csv")
 
-# 3. Load the KNN model
 knn = joblib.load("./knn_model.pkl")
 
 # 4. (Optional) If you saved your mood embeddings, load them
