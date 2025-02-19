@@ -8,7 +8,7 @@ const ActivitySuggestion = () => {
 
   const getSuggestion = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:8080/suggest', { mood }); 
+      const response = await axios.post('http://192.168.1.46:8000/suggest', { mood }); 
       setSuggestion(response.data.suggested_activity);
     } catch (error) {
       console.error(error);
