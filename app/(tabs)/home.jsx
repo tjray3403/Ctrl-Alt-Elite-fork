@@ -1,12 +1,10 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const home = () => {
+export default function map() {
   return (
     <View>
-      <Text>home</Text>
+      <Text>map</Text><Text></Text>
     </View>
   )
 }
-
-export default home
