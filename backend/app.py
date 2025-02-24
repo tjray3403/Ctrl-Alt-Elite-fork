@@ -5,24 +5,20 @@ import pandas as pd
 import numpy as np
 import spacy
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
-############################
-# Load your model & data
-############################
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 nlp = spacy.load("en_core_web_md")
 
-df_moods = pd.read_csv("./mood_activity.csv")
+csv_path = os.path.join(BASE_DIR, "mood_activity.csv")
+model_path = os.path.join(BASE_DIR, "knn_model.pkl")
 
-knn = joblib.load("./knn_model.pkl")
+df_moods = pd.read_csv(csv_path)
+knn = joblib.load(model_path)
 
-# 4. (Optional) If you saved your mood embeddings, load them
-#    But you only need these if you plan to keep them for reference
-# mood_embeddings = np.load("mood_embeddings.npy")
 
-############################
-# Recreate your get_vector, find_closest_mood, suggest_activity
-############################
 
 def get_vector(text):
     doc = nlp(text)
@@ -91,6 +87,10 @@ class SuggestRequest(BaseModel):
     mood: str
     steps: int = 0
     water: float = 0.0
+
+@app.get("/")
+def read_root():
+    return {"message": "FastAPI is running!"}
 
 @app.post("/suggest")
 def suggest_endpoint(data: SuggestRequest):

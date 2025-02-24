@@ -11,7 +11,7 @@ import axios from 'axios';
   
     const getSuggestion = async () => {
       try {
-        const response = await axios.post('http://serverIP:8000/suggest', { mood }); 
+        const response = await axios.post('https://tjray3403-pantherrecommendation.hf.space/suggest', { mood }); 
         setSuggestion(response.data.suggested_activity);
       } catch (error) {
         console.error(error);
