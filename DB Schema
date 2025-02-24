@@ -13,7 +13,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 #################################################################################
-2. classes
+2. classes #####
 Stores class schedule information.
 
 CREATE TABLE classes (
