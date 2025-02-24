@@ -11,7 +11,7 @@ const ActivitySuggestion = () => {
       const response = await axios.post('http://192.168.1.46:8000/suggest', { mood }); 
       setSuggestion(response.data.suggested_activity);
     } catch (error) {
-      console.error(error);
+      console.error(error); 
       setSuggestion("Error fetching suggestion.");
     }
   };

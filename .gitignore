@@ -43,3 +43,4 @@ yarn-error.*
 app-example
 backend/firebase_key.json
 /datasets
+app/tabs/Recommendations1.tsx
