@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import IndexScreen from "./index";
-import ExploreScreen from "./explore";
+import RecommendationScreen from "./recommendations";
 import ProfileScreen from "./profile";
 import MapScreen from "./map";
 
@@ -15,14 +15,14 @@ export default function TabLayout() {
           let iconName;
           if (route.name === "Home") {
             iconName = "home";
-          } else if (route.name === "Explore") {
+          } else if (route.name === "Recommendations") {
             iconName = "compass";
           } else if (route.name === "Map") {
             iconName = "map";
           } else if (route.name === "Profile") {
             iconName = "person";
           }
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName as 'filter' | 'infinite' | 'text' | 'key' | undefined} size={size} color={color} />;
         },
         tabBarActiveTintColor: "#FFD700", // Gold for active tab
         tabBarInactiveTintColor: "#A67C00", // Dark Gold for inactive
@@ -40,7 +40,7 @@ export default function TabLayout() {
       })}
     >
       <Tab.Screen name="Home" component={IndexScreen} />
-      <Tab.Screen name="Explore" component={ExploreScreen} />
+      <Tab.Screen name="Recommendations" component={RecommendationScreen} />
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>

@@ -73,7 +73,7 @@ app = FastAPI()
 # Allow calls from specific origins in development:
 origins = [
     "http://localhost:8081",       # React Native/Web?
-    "http://192.168.1.46:3000",    # if you run an Expo/Web dev server
+    "http://serverIP:3000",    # if you run an Expo/Web dev server
     # "exp://192.168.1.46:19000",  # Example for Expo
     # "http://localhost:3000",     # Another dev origin
 ]
