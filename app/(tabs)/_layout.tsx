@@ -29,7 +29,13 @@ export default function TabLayout() {
                     <FontAwesome name="user" size={24} color="black" />
                 )
             }}/>
-        <Tabs.Screen name='recommendations'
+        <Tabs.Screen name='Recommendations'
+            options={{
+                tabBarIcon:({color,size})=>(
+                    <FontAwesome name="smile-o" size={24} color="black" />
+                )
+            }}/>
+        <Tabs.Screen name='weather'
             options={{
                 tabBarIcon:({color,size})=>(
                     <FontAwesome name="smile-o" size={24} color="black" />
