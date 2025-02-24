@@ -5,6 +5,8 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 
+
+
 export default function TabLayout() {
   return (
     <Tabs screenOptions={{
