@@ -8,11 +8,20 @@ export default function HomeScreen() {
   const router = useRouter();
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🏡 Homsdee</Text>
+      <Text style={styles.title}>🏡 Home</Text>
       <Text style={styles.profileInfo}>Welcome to the Panther Pace App!</Text>
 
       <Link style={styles.link} href={"/(tabs)/weather"}>
         <Text>Weather</Text>
+      </Link>
+      <Link style={styles.link} href={"/(tabs)/sleep"}>
+        <Text>Sleep</Text>
+      </Link>
+      <Link style={styles.link} href={"/(tabs)/water"}>
+        <Text>Water</Text>
+      </Link>
+      <Link style={styles.link} href={"/(tabs)/steps"}>
+        <Text>Steps</Text>
       </Link>
 
       <TouchableOpacity style={styles.primaryButton}>
