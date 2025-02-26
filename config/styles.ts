@@ -88,4 +88,42 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
+  link: {
+    color: "#6A0DAD",
+    fontSize: 16,
+    marginBottom: 10,
+    backgroundColor: "#FFD700",
+    padding: 10,
+    borderRadius: 10,
+    textAlign: "center",
+  },
+
+  weatherContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    paddingTop: 20,
+  },
+  weatherTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#6A0DAD",
+  },
+  weatherContainerInfo: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: 20,
+    fontSize: 20,
+  },
+
+  textWeather: {
+    fontSize: 20,
+  },
+  infoWeather: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#6A0DAD",
+  },
 });
