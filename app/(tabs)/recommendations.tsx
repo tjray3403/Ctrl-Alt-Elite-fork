@@ -1,49 +1,95 @@
-
 import { styles } from "../../config/styles";
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity } from 'react-native';
-import axios from 'axios';
- 
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator } from "react-native";
+import axios from "axios";
 
-  const RecommendationScreen = () => {
-    const [mood, setMood] = useState('');
-    const [suggestion, setSuggestion] = useState('');
-  
-    const getSuggestion = async () => {
-      try {
-        const response = await axios.post('https://tjray3403-pantherrecommendation.hf.space/suggest', { mood }); 
-        setSuggestion(response.data.suggested_activity);
-      } catch (error) {
-        console.error(error);
-        setSuggestion("Error fetching suggestion.");
-      }
-    };
-  
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>How are you feeling?</Text>
-        <TextInput 
-          value={mood}
-          onChangeText={setMood}
-          placeholder="Enter a mood (e.g., happy, stressed)"
-          style={styles.profileInfo}
-        />
-        <Button title="Get Suggestion" onPress={getSuggestion} />
-        <Text style={{ marginTop: 20 }}>{suggestion}</Text>
-      </View>
-    );
+// 🔹 Typing Effect Component
+const TypingEffect: React.FC<{ text?: string }> = ({ text = "" }) => {
+  const [displayedText, setDisplayedText] = useState("");
+
+  useEffect(() => {
+    if (!text) return; 
+
+    setDisplayedText(""); 
+    let index = 0;
+
+    const interval = setInterval(() => {
+      setDisplayedText((prev) => {
+        if (index < text.length) {
+          return prev + text.charAt(index++); 
+        } else {
+          clearInterval(interval);
+          return prev;
+        }
+      });
+    }, 50); 
+
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return <Text style={styles.profileInfo}>{displayedText}</Text>;
+};
+
+
+const LoadingDots: React.FC = () => {
+  const [dots, setDots] = useState(".");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length < 3 ? prev + "." : "."));
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <Text style={styles.profileInfo}>{dots}</Text>;
+};
+
+const RecommendationScreen: React.FC = () => {
+  const [mood, setMood] = useState("");
+  const [suggestion, setSuggestion] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const getSuggestion = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "https://tjray3403-pantherrecommendation.hf.space/suggest",
+        { mood }
+      );
+      setSuggestion(response.data.suggested_activity);
+    } catch (error) {
+      console.error(error);
+      setSuggestion("Error fetching suggestion.");
+    } finally {
+      setLoading(false);
+    }
   };
-  
-  export default RecommendationScreen;
 
+  return (
+    <View style={styles.container}>
+      
+      <TextInput
+        value={mood}
+        onChangeText={setMood}
+        placeholder="I'm feeling..."
+        placeholderTextColor="#888"
+        style={styles.input}
+      />
 
-    /*<View style={styles.container}>
-      <Text style={styles.title}>🌍 Explore</Text>
-      <Text style={styles.profileInfo}>Discover new workouts and fitness tips.</Text>
-
-      <TouchableOpacity style={styles.primaryButton}>
-        <Text style={styles.buttonText}>Find New Workouts</Text>
+      <TouchableOpacity style={styles.recommendation_button} onPress={getSuggestion}>
+        <Text style={styles.buttonText}>Get Suggestion</Text>
       </TouchableOpacity>
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#8A56AC" />
+      ) : suggestion ? (
+        <View style={styles.recommendation_suggestionBox}>
+          <TypingEffect text={suggestion} />
+        </View>
+      ) : null}
     </View>
-  );*/
+  );
+};
+
+export default RecommendationScreen;
 
