@@ -36,7 +36,7 @@ export default function ProfileScreen() {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setUserData(docSnap.data());
+          setUserData(docSnap.data() as { name: string; dob: string; weight: string });
         }
       } catch (error) {
         console.error("❌ Firestore Fetch Error:", error);
@@ -69,8 +69,10 @@ export default function ProfileScreen() {
 
       Alert.alert("✅ Profile Updated!", "Your information has been saved.");
     } catch (error) {
+      if (error instanceof Error && "code" in error) {
       console.error("❌ Firestore Update Error:", error);
       Alert.alert("❌ Update Failed", error.message);
+      }
     }
   };
 
@@ -81,7 +83,13 @@ export default function ProfileScreen() {
     }
 
     try {
-      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+
+      if (!user) {
+        console.error("No authenticated user found.");
+        return;
+      }
+
+      const credential = EmailAuthProvider.credential(user.email!, currentPassword);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPassword);
 
@@ -90,8 +98,11 @@ export default function ProfileScreen() {
 
       Alert.alert("✅ Success", "Your password has been updated.");
     } catch (error) {
+      if (error instanceof Error && "code" in error) {
       console.error("❌ Password Update Error:", error);
       Alert.alert("❌ Error", error.code === "auth/wrong-password" ? "Incorrect current password." : error.message);
+    
+      }
     }
   };
 
