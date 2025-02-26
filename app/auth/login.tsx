@@ -21,8 +21,9 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.replace("/tabs/profile");
+      router.replace("/(tabs)/profile");
     } catch (error) {
+      if (error instanceof Error && "code" in error) {
       if (error.code === "auth/user-not-found") {
         setErrorMessage("❌ No account found with this email.");
       } else if (error.code === "auth/wrong-password") {
@@ -30,6 +31,7 @@ export default function Login() {
       } else {
         setErrorMessage("❌ Login failed. Please check your credentials.");
       }
+    }
     }
   };
 
