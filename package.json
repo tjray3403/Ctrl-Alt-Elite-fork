@@ -24,6 +24,7 @@
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
+    "axios": "^1.7.9",
     "expo": "~52.0.36",
     "expo-blur": "~14.0.1",
     "expo-constants": "~17.0.5",
@@ -65,7 +66,8 @@
     "typescript": "^5.3.3"
   },
   "overrides": {
-    "cookie": "^0.7.2"
+    "cookie": "^0.7.2",
+    "undici": "^7.3.0"
   },
   "private": true
 }
