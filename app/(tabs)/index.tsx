@@ -15,7 +15,7 @@ export default function HomeScreen() {
         <Text>Weather</Text>
       </Link>
 
-      <Link style={styles.link} href={"/(tabs)"}>
+      <Link style={styles.link} href={"/class/list_classes_screen"}>
         <Text>Class</Text>
       </Link>
 
