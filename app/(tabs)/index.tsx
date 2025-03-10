@@ -15,6 +15,10 @@ export default function HomeScreen() {
         <Text>Weather</Text>
       </Link>
 
+      <Link style={styles.link} href={"/(tabs)"}>
+        <Text>Class</Text>
+      </Link>
+
       <TouchableOpacity style={styles.primaryButton}>
         <Text style={styles.buttonText}>Start Workout</Text>
       </TouchableOpacity>
