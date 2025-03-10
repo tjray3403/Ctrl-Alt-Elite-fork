@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, Alert, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { db } from '@/config/firebase';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -20,20 +20,26 @@ const EditClassScreen: React.FC = () => {
   const { classId } = useLocalSearchParams();
   const router = useRouter();
 
-  const [classData, setClassData] = useState<ClassData>({
-    name: '',
-    professor: '',
-    building: '',
-    roomNumber: '',
-    imageUrl: '',
-    note: '',
-  });
-
+  const [classData, setClassData] = useState<ClassData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || !classId) return;
 
+    if (!user) {
+        console.error("❌ User is not authenticated. Cannot fetch data.");
+        return;
+      }
+    
+      if (!classId) {
+        console.error("❌ Missing classId. Cannot fetch data.");
+        return;
+      }
+
+    if (!user || !classId) {
+      setLoading(false);
+      return;
+    }
+    console.log("Received classId from params:", classId);
     const fetchClass = async () => {
       try {
         const docRef = doc(db, `users/${user.uid}/classes/${classId}`);
@@ -45,12 +51,12 @@ const EditClassScreen: React.FC = () => {
           Alert.alert('Error', 'Class not found');
           setTimeout(() => {
             router.push('/class/list_classes_screen');
-          }, 100);
+          }, 100); // Redirect if class not found
         }
       } catch (err) {
         console.error('Error fetching class:', err);
       } finally {
-        setLoading(false);
+        setLoading(false); // ✅ Ensure loading is set to false after fetch
       }
     };
 
@@ -58,7 +64,7 @@ const EditClassScreen: React.FC = () => {
   }, [user, classId]);
 
   const handleUpdateClass = async () => {
-    if (!user || !classId) return;
+    if (!user || !classId || !classData) return;
 
     try {
       const docRef = doc(db, `users/${user.uid}/classes/${classId}`);
@@ -67,7 +73,7 @@ const EditClassScreen: React.FC = () => {
       Alert.alert('Success', 'Class updated successfully');
       setTimeout(() => {
         router.push('/class/list_classes_screen');
-      }, 100);
+      }, 100); // Navigate back after update
     } catch (err) {
       console.error('Error updating class:', err);
       Alert.alert('Error', 'Could not update class');
@@ -90,7 +96,7 @@ const EditClassScreen: React.FC = () => {
             Alert.alert('Deleted', 'Class removed successfully');
             setTimeout(() => {
                 router.push('/class/list_classes_screen');
-              }, 100);
+              }, 100); // Navigate back after delete
           } catch (err) {
             console.error('Error deleting class:', err);
             Alert.alert('Error', 'Could not delete class');
@@ -102,8 +108,17 @@ const EditClassScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
         <Text>Loading class data...</Text>
+      </View>
+    );
+  }
+
+  if (!classData) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Class not found.</Text>
       </View>
     );
   }
@@ -166,6 +181,11 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   label: {
     fontWeight: 'bold',
     marginTop: 12,
@@ -176,5 +196,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
     marginTop: 4,
+  },
+  errorText: {
+    fontSize: 18,
+    color: 'red',
+    textAlign: 'center',
   },
 });

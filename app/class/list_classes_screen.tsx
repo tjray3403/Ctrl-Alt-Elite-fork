@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Button } from 'react-native';
 import { db } from '@/config/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { Link } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 
 interface ClassItem {
   id: string;
@@ -18,69 +17,73 @@ interface ClassItem {
 const ListClassesScreen: React.FC = () => {
   const auth = getAuth();
   const user = auth.currentUser;
+  const router = useRouter();
 
   const [classes, setClasses] = useState<ClassItem[]>([]);
-  useFocusEffect(
-    useCallback(() => {
-      if (!user) return;
-  
-      const fetchClasses = async () => {
-        try {
-          const userClassesRef = collection(db, `users/${user.uid}/classes`);
-          const snapshot = await getDocs(userClassesRef);
-          const data = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as ClassItem[];
-          setClasses(data);
-        } catch (err) {
-          console.error('Error fetching classes:', err);
-        }
-      };
-  
-      fetchClasses();
-    }, [user]) // This makes sure it updates when the user changes
-  );
-  const renderClassCard = ({ item }: { item: ClassItem }) => {
-    return (
-      <Link href={`/class/class_detail_screen?classId=${item.id}`} asChild>
-        <TouchableOpacity style={styles.card}>
-          <Image
-            //source={item.imageUrl ? { uri: item.imageUrl } : require('@/assets/placeholder.png')}
-            style={styles.cardImage}
-          />
-          <View style={styles.cardContent}>
-            <Text style={styles.className}>{item.name}</Text>
-            {item.professor && <Text style={styles.classSubInfo}>{item.professor}</Text>}
-            <Text style={styles.classSubInfo}>{item.building}</Text>
-          </View>
-        </TouchableOpacity>
-      </Link>
-    );
+  const [editMode, setEditMode] = useState(false); // ✅ Tracks if user is in "Edit Mode"
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchClasses = async () => {
+      try {
+        const userClassesRef = collection(db, `users/${user.uid}/classes`);
+        const snapshot = await getDocs(userClassesRef);
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as ClassItem[];
+        setClasses(data);
+      } catch (err) {
+        console.error('Error fetching classes:', err);
+      }
+    };
+
+    fetchClasses();
+  }, [user]);
+
+  const handleClassSelect = (classId: string) => {
+    if (editMode) {
+      router.push(`/class/edit_class_screen?classId=${classId}`);
+    }
   };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>
-          <Link href="/">
-          My Classes </Link> </Text>
-
+        <Text style={styles.title}>My Classes</Text>
         <View style={styles.buttonContainer}>
-          <Link href="/class/add_class_screen" asChild>
-            <Button title="Add Class" />
-          </Link>
-          <Link href="/class/edit_class_screen" asChild>
-            <Button title="Edit Classes" />
-          </Link>
+          <Button title="Add Class" onPress={() => router.push('/class/add_class_screen')} />
+          {editMode ? (
+            <Button title="Cancel" onPress={() => setEditMode(false)} color="red" />
+          ) : (
+            <Button title="Edit Classes" onPress={() => setEditMode(true)} />
+          )}
         </View>
       </View>
 
       {/* List of Classes */}
       <FlatList
         data={classes}
-        renderItem={renderClassCard}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={[styles.card, editMode && styles.selectableCard]} // ✅ Highlights when in edit mode
+            onPress={() => handleClassSelect(item.id)}
+            disabled={!editMode} // ✅ Only selectable when in edit mode
+          >
+            <Image
+           //
+              source={item.imageUrl ? { uri: item.imageUrl } : require('@/pantherpace_logo.jpg')}
+              style={styles.cardImage}
+            />
+            <View style={styles.cardContent}>
+              <Text style={styles.className}>{item.name}</Text>
+              {item.professor && <Text style={styles.classSubInfo}>{item.professor}</Text>}
+              <Text style={styles.classSubInfo}>{item.building}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
       />
@@ -123,6 +126,10 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: 'center',
     padding: 10,
+  },
+  selectableCard: {
+    borderWidth: 2, // ✅ Highlights cards in edit mode
+    borderColor: 'blue',
   },
   cardImage: {
     width: 60,
