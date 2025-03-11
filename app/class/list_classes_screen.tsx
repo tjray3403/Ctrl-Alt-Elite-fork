@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Button } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Button, Platform } from 'react-native';
 import { db } from '@/config/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'expo-router';
+import moment from 'moment'; // ✅ Helps parse time strings
 
 interface ClassItem {
   id: string;
@@ -12,6 +13,8 @@ interface ClassItem {
   professor?: string;
   building?: string;
   roomNumber?: string;
+  startTime: string;
+  date?: string;
 }
 
 const ListClassesScreen: React.FC = () => {
@@ -33,7 +36,26 @@ const ListClassesScreen: React.FC = () => {
           id: doc.id,
           ...doc.data()
         })) as ClassItem[];
-        setClasses(data);
+        // ✅ Get today's date in "YYYY-MM-DD" format
+        const todayDate = moment().format('YYYY-MM-DD');
+
+        // ✅ Filter classes for today or those without a specific date
+        const todaysClasses = data.filter(classItem => {
+          return !classItem.date || classItem.date === todayDate; // Show only today's classes or those without a date
+        });
+
+        // ✅ Sort classes by start time
+        const sortedClasses = todaysClasses.sort((a, b) => {
+          const timeA = moment(a.startTime, "hh:mm A");
+          const timeB = moment(b.startTime, "hh:mm A");
+          return timeA.diff(timeB);
+        });
+
+        setClasses(sortedClasses);
+
+
+
+
       } catch (err) {
         console.error('Error fetching classes:', err);
       }
@@ -45,22 +67,24 @@ const ListClassesScreen: React.FC = () => {
   const handleClassSelect = (classId: string) => {
     if (editMode) {
       router.push(`/class/edit_class_screen?classId=${classId}`);
+    } else {
+      router.push(`/class/class_detail_screen?classId=${classId}`);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>My Classes</Text>
-        <View style={styles.buttonContainer}>
-          <Button title="Add Class" onPress={() => router.push('/class/add_class_screen')} />
-          {editMode ? (
-            <Button title="Cancel" onPress={() => setEditMode(false)} color="red" />
-          ) : (
-            <Button title="Edit Classes" onPress={() => setEditMode(true)} />
-          )}
-        </View>
+      {/* Title */}
+      <Text style={styles.title}>My Classes</Text>
+
+      {/* Buttons - Positioned Below Title */}
+      <View style={styles.buttonContainer}>
+        <Button title="Add Class" onPress={() => router.push('/class/add_class_screen')} />
+        {editMode ? (
+          <Button title="Cancel" onPress={() => setEditMode(false)} color="red" />
+        ) : (
+          <Button title="Edit Classes" onPress={() => setEditMode(true)} />
+        )}
       </View>
 
       {/* List of Classes */}
@@ -70,10 +94,8 @@ const ListClassesScreen: React.FC = () => {
           <TouchableOpacity
             style={[styles.card, editMode && styles.selectableCard]} // ✅ Highlights when in edit mode
             onPress={() => handleClassSelect(item.id)}
-            disabled={!editMode} // ✅ Only selectable when in edit mode
           >
             <Image
-           //
               source={item.imageUrl ? { uri: item.imageUrl } : require('@/pantherpace_logo.jpg')}
               style={styles.cardImage}
             />
@@ -98,21 +120,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fafafa',
     paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20, // ✅ Ensures spacing for status bar on iOS
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    textAlign: 'center', // ✅ Centers title
+    marginBottom: 10,  // ✅ Adds space before buttons
   },
   buttonContainer: {
     flexDirection: 'row',
+    justifyContent: 'flex-end', // ✅ Centers buttons horizontally
     gap: 10,
+    marginBottom: 15, // ✅ Space between buttons and class list
   },
   listContent: {
     paddingBottom: 16,
@@ -126,6 +146,23 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: 'center',
     padding: 10,
+
+    // ✅ iOS Shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    
+    // ✅ Web Shadow (Uses CSS)
+    ...Platform.select({
+      web: {
+        shadowColor: 'rgba(0, 0, 0, 0.2)',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 10,
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // ✅ Web-specific shadow
+      },
+    }),
   },
   selectableCard: {
     borderWidth: 2, // ✅ Highlights cards in edit mode
@@ -135,11 +172,14 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 10,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   cardContent: {
     flex: 1,
     marginLeft: 10,
+    justifyContent: 'center', // ✅ Centers text vertically
+    alignItems: 'center', // ✅ Centers text horizontally
+    textAlign: 'center',
   },
   className: {
     fontSize: 16,

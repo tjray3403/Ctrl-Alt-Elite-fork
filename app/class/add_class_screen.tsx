@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { 
+  View, TextInput, Button, Text, ScrollView, StyleSheet, TouchableOpacity, Platform 
+} from 'react-native';
 import { db } from '@/config/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'expo-router';
-
+import DateTimePicker from '@react-native-community/datetimepicker'; // ✅ Works for iOS & Android
+import moment from 'moment';
 
 const AddClassScreen: React.FC = () => {
   const auth = getAuth();
   const user = auth.currentUser;
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
 
   const [name, setName] = useState('');
   const [professor, setProfessor] = useState('');
@@ -18,11 +20,19 @@ const AddClassScreen: React.FC = () => {
   const [roomNumber, setRoomNumber] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [note, setNote] = useState('');
+  const [startTime, setStartTime] = useState(''); // ✅ Stores selected time
   const [error, setError] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  // ✅ Handles time selection across platforms
+  const handleConfirmTime = (event: any, selectedTime?: Date) => {
+    if (selectedTime) {
+      setSelectedDate(selectedTime);
+      setStartTime(moment(selectedTime).format('hh:mm A')); // ✅ Ensures standard "08:30 AM" format
+    }
+    setTimePickerVisible(false);
+  };
 
   const handleAddClass = async () => {
     if (!user) {
@@ -30,16 +40,13 @@ const AddClassScreen: React.FC = () => {
       return;
     }
 
-    if (!name || !building) {
-      setError('Please fill out at least the Class Name and Building.');
+    if (!name || !building || !startTime) {
+      setError('Please fill out at least the Class Name, Building, and Start Time.');
       return;
     }
 
     try {
-      // Reference to the user's classes subcollection
       const userClassesRef = collection(db, `users/${user.uid}/classes`);
-
-      // Add the new class document under the user's Firestore document
       await addDoc(userClassesRef, {
         name,
         professor: professor || null, // Optional
@@ -47,7 +54,8 @@ const AddClassScreen: React.FC = () => {
         roomNumber: roomNumber || null, // Optional
         imageUrl: imageUrl || null, // Optional
         note: note || null, // Optional
-        createdAt: serverTimestamp(),
+        startTime, // ✅ Stores formatted start time
+        createdAt: serverTimestamp(), // ✅ Uses Firestore server timestamp
       });
 
       // Clear inputs
@@ -57,15 +65,15 @@ const AddClassScreen: React.FC = () => {
       setRoomNumber('');
       setImageUrl('');
       setNote('');
+      setStartTime('');
       setError('');
-
-      alert('Class added successfully!');
+      alert('✅ Class added successfully!');
 
       setTimeout(() => {
-        router.push('/class/list_classes_screen');
+        router.replace('/class/list_classes_screen'); // ✅ Prevents navigation history stacking
       }, 100);
     } catch (err) {
-      console.error('Error adding class:', err);
+      console.error('❌ Error adding class:', err);
       setError('Could not add class. Please try again.');
     }
   };
@@ -84,6 +92,36 @@ const AddClassScreen: React.FC = () => {
       <Text style={styles.label}>Room Number (Optional)</Text>
       <TextInput style={styles.input} value={roomNumber} onChangeText={setRoomNumber} />
 
+      {/* ✅ Cross-platform Time Picker */}
+      <Text style={styles.label}>Start Time *</Text>
+
+      {Platform.OS === 'web' ? (
+        // ✅ Web: Use native HTML time input
+        <TextInput
+          style={styles.input}
+          value={startTime}
+          onChangeText={(text) => setStartTime(text)}
+          placeholder="Select Time"
+        />
+      ) : (
+        // ✅ Mobile: Use native picker
+        <TouchableOpacity style={styles.timePicker} onPress={() => setTimePickerVisible(true)}>
+          <Text style={startTime ? styles.selectedTime : styles.placeholderText}>
+            {startTime || 'Select Time'}
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      {Platform.OS !== 'web' && isTimePickerVisible && (
+        <DateTimePicker
+          value={selectedDate || new Date()}
+          mode="time"
+          is24Hour={false}
+          display="spinner"
+          onChange={handleConfirmTime}
+        />
+      )}
+
       <Text style={styles.label}>Image URL (Optional)</Text>
       <TextInput style={styles.input} value={imageUrl} onChangeText={setImageUrl} />
 
@@ -92,7 +130,7 @@ const AddClassScreen: React.FC = () => {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Button title="Add Class" onPress={handleAddClass} />
+      <Button title="Add Class" onPress={handleAddClass} color="#28a745" />
     </ScrollView>
   );
 };
@@ -100,8 +138,39 @@ const AddClassScreen: React.FC = () => {
 export default AddClassScreen;
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: '#fff' },
-  label: { fontWeight: 'bold', marginTop: 12 },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 4, padding: 8, marginTop: 4 },
-  error: { color: 'red', marginVertical: 8 },
+  container: { 
+    flex: 1,
+    padding: 16, 
+    backgroundColor: '#fff' 
+  },
+  label: { 
+    fontWeight: 'bold', 
+    marginTop: 12 
+  },
+  input: { 
+    borderWidth: 1, 
+    borderColor: '#ccc', 
+    borderRadius: 4, 
+    padding: 10, 
+    marginTop: 4 
+  },
+  timePicker: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    padding: 10,
+    marginTop: 4,
+    alignItems: 'center',
+  },
+  selectedTime: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  placeholderText: {
+    color: '#888',
+  },
+  error: { 
+    color: 'red', 
+    marginVertical: 8 
+  },
 });

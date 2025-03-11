@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Platform  } from 'react-native';
 import { db } from '@/config/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useLocalSearchParams } from 'expo-router';
 import { getAuth } from 'firebase/auth';
+
 
 interface ClassData {
   name: string;
@@ -53,7 +54,7 @@ const ClassDetailScreen: React.FC = () => {
     <ScrollView style={styles.container}>
       {/* Top image / banner */}
       <Image
-       // source={classData.imageUrl ? { uri: classData.imageUrl } : require('@/assets/placeholder.png')}
+        source={classData.imageUrl ? { uri: classData.imageUrl } : require('@/pantherpace_logo.jpg')}
         style={styles.bannerImage}
       />
 
@@ -81,13 +82,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    
+    // ✅ iOS Shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+
+    // ✅ Android Shadow
+    elevation: 4,
+
+    // ✅ Web Shadow (Uses CSS)
+    ...Platform.select({
+      web: {
+        shadowColor: 'rgba(0, 0, 0, 0.2)',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 10,
+        // This is the equivalent of `box-shadow` in CSS
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+      },
+    }),
+
   },
   bannerImage: {
     width: '100%',
-    height: 200,
-    resizeMode: 'cover',
+    height: '100%',
+    resizeMode: 'contain',
   },
   detailsContainer: {
+    alignItems: 'center',
     padding: 16,
   },
   classTitle: {

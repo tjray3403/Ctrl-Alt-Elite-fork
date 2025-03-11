@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Button, Alert, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Platform } from 'react-native';
 import { db } from '@/config/firebase';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 interface ClassData {
   name: string;
@@ -12,6 +14,7 @@ interface ClassData {
   roomNumber?: string;
   imageUrl?: string;
   note?: string;
+  startTime: string; // ✅ Added startTime
 }
 
 const EditClassScreen: React.FC = () => {
@@ -22,24 +25,14 @@ const EditClassScreen: React.FC = () => {
 
   const [classData, setClassData] = useState<ClassData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isTimePickerVisible, setTimePickerVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
+    if (!user || !classId) return;
 
-    if (!user) {
-        console.error("❌ User is not authenticated. Cannot fetch data.");
-        return;
-      }
-    
-      if (!classId) {
-        console.error("❌ Missing classId. Cannot fetch data.");
-        return;
-      }
-
-    if (!user || !classId) {
-      setLoading(false);
-      return;
-    }
     console.log("Received classId from params:", classId);
+
     const fetchClass = async () => {
       try {
         const docRef = doc(db, `users/${user.uid}/classes/${classId}`);
@@ -50,18 +43,27 @@ const EditClassScreen: React.FC = () => {
         } else {
           Alert.alert('Error', 'Class not found');
           setTimeout(() => {
-            router.push('/class/list_classes_screen');
-          }, 100); // Redirect if class not found
+            router.replace('/class/list_classes_screen');
+          }, 100);
         }
       } catch (err) {
         console.error('Error fetching class:', err);
       } finally {
-        setLoading(false); // ✅ Ensure loading is set to false after fetch
+        setLoading(false);
       }
     };
 
     fetchClass();
   }, [user, classId]);
+
+  // ✅ Handles Time Selection
+  const handleConfirmTime = (event: any, selectedTime?: Date) => {
+    if (selectedTime && classData) {
+      setSelectedDate(selectedTime);
+      setClassData({ ...classData, startTime: moment(selectedTime).format('hh:mm A') });
+    }
+    setTimePickerVisible(false);
+  };
 
   const handleUpdateClass = async () => {
     if (!user || !classId || !classData) return;
@@ -72,8 +74,8 @@ const EditClassScreen: React.FC = () => {
 
       Alert.alert('Success', 'Class updated successfully');
       setTimeout(() => {
-        router.push('/class/list_classes_screen');
-      }, 100); // Navigate back after update
+        router.replace('/class/list_classes_screen');
+      }, 100);
     } catch (err) {
       console.error('Error updating class:', err);
       Alert.alert('Error', 'Could not update class');
@@ -95,8 +97,8 @@ const EditClassScreen: React.FC = () => {
 
             Alert.alert('Deleted', 'Class removed successfully');
             setTimeout(() => {
-                router.push('/class/list_classes_screen');
-              }, 100); // Navigate back after delete
+              router.replace('/class/list_classes_screen');
+            }, 100);
           } catch (err) {
             console.error('Error deleting class:', err);
             Alert.alert('Error', 'Could not delete class');
@@ -152,6 +154,33 @@ const EditClassScreen: React.FC = () => {
         value={classData.roomNumber || ''}
         onChangeText={(text) => setClassData({ ...classData, roomNumber: text })}
       />
+
+      {/* ✅ Start Time */}
+      <Text style={styles.label}>Start Time *</Text>
+      {Platform.OS === 'web' ? (
+        // ✅ Web: Use native HTML time input
+        <TextInput
+          style={styles.input}
+          value={classData.startTime}
+          onChangeText={(text) => setClassData({ ...classData, startTime: text })}
+          placeholder="Select Time"
+        />
+      ) : (
+        // ✅ Mobile: Use native picker
+        <TouchableOpacity style={styles.input} onPress={() => setTimePickerVisible(true)}>
+          <Text>{classData.startTime || 'Select Time'}</Text>
+        </TouchableOpacity>
+      )}
+
+      {Platform.OS !== 'web' && isTimePickerVisible && (
+        <DateTimePicker
+          value={selectedDate || new Date()}
+          mode="time"
+          is24Hour={false}
+          display="spinner"
+          onChange={handleConfirmTime}
+        />
+      )}
 
       <Text style={styles.label}>Image URL (Optional)</Text>
       <TextInput
