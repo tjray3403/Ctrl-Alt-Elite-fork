@@ -20,9 +20,11 @@ export default function Signup() {
       await setDoc(doc(db, "users", user.uid), { name, email });
 
       Alert.alert("✅ Signup Success", "Account created successfully!");
-      router.replace("/tabs/profile");
+      router.replace("/(tabs)/profile");
     } catch (error) {
+      if (error instanceof Error && "code" in error) {
       Alert.alert("❌ Signup Failed", error.message);
+      }
     }
   };
 
