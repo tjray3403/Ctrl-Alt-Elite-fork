@@ -83,7 +83,7 @@ export default function HomeScreen() {
       {nextClass ? (
         <TouchableOpacity 
           style={styles.classCard} 
-          onPress={() => router.push(`/class/class_detail_screen?classId=${nextClass.id}`)}
+          onPress={() => router.push(`/class/list_classes_screen`)}
         >
           <Image 
             source={nextClass.imageUrl ? { uri: nextClass.imageUrl } : require('@/pantherpace_logo.jpg')} 
