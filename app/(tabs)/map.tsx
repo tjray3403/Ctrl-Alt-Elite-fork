@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { PROVIDER_DEFAULT } from 'react-native-maps';
 import { StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
 import { useNavigation } from 'expo-router';
 
@@ -43,7 +43,7 @@ const focusMap = () => {
 
   return (
     <View style={{flex: 1}}>
-      <MapView style={StyleSheet.absoluteFill} provider={PROVIDER_GOOGLE}
+      <MapView style={StyleSheet.absoluteFill} provider={PROVIDER_DEFAULT}
       initialRegion={INITIAL_REGION}
       showsUserLocation
       showsMyLocationButton
