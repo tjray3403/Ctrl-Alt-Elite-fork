@@ -113,13 +113,16 @@ const AddClassScreen: React.FC = () => {
       )}
 
       {Platform.OS !== 'web' && isTimePickerVisible && (
-        <DateTimePicker
+       <View style={styles.pickerContainer}> 
+       <DateTimePicker
           value={selectedDate || new Date()}
           mode="time"
           is24Hour={false}
           display="spinner"
+          textColor="black"
           onChange={handleConfirmTime}
         />
+        </View>
       )}
 
       <Text style={styles.label}>Image URL (Optional)</Text>
@@ -146,6 +149,13 @@ const styles = StyleSheet.create({
   label: { 
     fontWeight: 'bold', 
     marginTop: 12 
+  },
+  pickerContainer: {
+    backgroundColor: '#fff', 
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   input: { 
     borderWidth: 1, 
