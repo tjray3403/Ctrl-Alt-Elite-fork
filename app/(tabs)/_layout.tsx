@@ -8,7 +8,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#FFD700", // Gold for active tab
-        tabBarInactiveTintColor: "#A67C00", // Dark Gold for inactive
+        tabBarInactiveTintColor: "white", // Dark Gold for inactive
         tabBarStyle: {
           backgroundColor: "#6A0DAD", // Purple background
           borderTopColor: "#FFD700", // Gold border at the top
@@ -48,7 +48,7 @@ export default function TabLayout() {
         options={{
           title: "Recommendations",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="compass" size={28} color={color} />
+            <Ionicons name="leaf" size={28} color={color} />
           ),
         }}
       />
@@ -67,6 +67,15 @@ export default function TabLayout() {
           title: "Profile",
           tabBarIcon: ({ color }) => (
             <Ionicons name="person" size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="settings" size={28} color={color} />
           ),
         }}
       />
