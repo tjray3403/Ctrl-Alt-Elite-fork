@@ -6,7 +6,7 @@ import { db } from '@/config/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker'; // ✅ Works for iOS & Android
+import DateTimePicker from '@react-native-community/datetimepicker'; //  Works for iOS & Android
 import moment from 'moment';
 
 const AddClassScreen: React.FC = () => {
@@ -20,16 +20,16 @@ const AddClassScreen: React.FC = () => {
   const [roomNumber, setRoomNumber] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [note, setNote] = useState('');
-  const [startTime, setStartTime] = useState(''); // ✅ Stores selected time
+  const [startTime, setStartTime] = useState(''); //  Stores selected time
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
-  // ✅ Handles time selection across platforms
+  //  Handles time selection across platforms
   const handleConfirmTime = (event: any, selectedTime?: Date) => {
     if (selectedTime) {
       setSelectedDate(selectedTime);
-      setStartTime(moment(selectedTime).format('hh:mm A')); // ✅ Ensures standard "08:30 AM" format
+      setStartTime(moment(selectedTime).format('hh:mm A')); //  Ensures standard "08:30 AM" format
     }
     setTimePickerVisible(false);
   };
@@ -54,8 +54,8 @@ const AddClassScreen: React.FC = () => {
         roomNumber: roomNumber || null, // Optional
         imageUrl: imageUrl || null, // Optional
         note: note || null, // Optional
-        startTime, // ✅ Stores formatted start time
-        createdAt: serverTimestamp(), // ✅ Uses Firestore server timestamp
+        startTime, //  Stores formatted start time
+        createdAt: serverTimestamp(), //  Uses Firestore server timestamp
       });
 
       // Clear inputs
@@ -70,7 +70,7 @@ const AddClassScreen: React.FC = () => {
       alert('✅ Class added successfully!');
 
       setTimeout(() => {
-        router.replace('/class/list_classes_screen'); // ✅ Prevents navigation history stacking
+        router.replace('/class/list_classes_screen'); //  Prevents navigation history stacking
       }, 100);
     } catch (err) {
       console.error('❌ Error adding class:', err);
@@ -92,11 +92,11 @@ const AddClassScreen: React.FC = () => {
       <Text style={styles.label}>Room Number (Optional)</Text>
       <TextInput style={styles.input} value={roomNumber} onChangeText={setRoomNumber} />
 
-      {/* ✅ Cross-platform Time Picker */}
+      {/*  Cross-platform Time Picker */}
       <Text style={styles.label}>Start Time *</Text>
 
       {Platform.OS === 'web' ? (
-        // ✅ Web: Use native HTML time input
+        //  Web: Use native HTML time input
         <TextInput
           style={styles.input}
           value={startTime}
@@ -104,7 +104,7 @@ const AddClassScreen: React.FC = () => {
           placeholder="Select Time"
         />
       ) : (
-        // ✅ Mobile: Use native picker
+        //  Mobile: Use native picker
         <TouchableOpacity style={styles.timePicker} onPress={() => setTimePickerVisible(true)}>
           <Text style={startTime ? styles.selectedTime : styles.placeholderText}>
             {startTime || 'Select Time'}
