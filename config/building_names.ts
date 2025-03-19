@@ -1,6 +1,37 @@
-export enum Buildings {
-    Building_name = "building_name"
-  }
-  
-  
-  
+// src/constants/enums.ts
+export enum LocationName {
+  HenriettaTFarrelHall = "Henrietta T. Farrel Hall",
+  SRCollins = "SR Collins",
+  AustinGreauxChemicalEngineeringBuilding = "Austin Greaux Chemical Engineering Building",
+  ENCARB = "ENCARB",
+  StudentPark = "Student Park",
+  PrairieViewWWTP = "Prairie View WWTP",
+  CentralReceiving = "Central Receiving",
+  DepartmentOfPublicSafety = "Department of Public Safety",
+  MayHallEconomicsBuilding = "May Hall Economics Building",
+  CLWilsonBuilding = "CL Wilson Building",
+  NewElectricalEngineeringBuilding = "New Electrical Engineering Building",
+  JessieMaryGibbsJonesAgricultureResearchBuilding = "Jessie & Mary Gibbs Jones Agriculture Research Building",
+  EBEvansBuilding = "E.B Evans Building",
+  UniversitySquare = "University Square",
+  CollegeOfJuvenileJusticeAndPsychology = "College of Juvenile Justice and Psychology",
+  AgricultureBusinessBuilding = "Agriculture Business Building",
+  HillardHallCommunicationBuilding = "Hillard Hall Communication Building",
+  GRWollfolkPoliticalScienceBuilding = "G.R. Wollfolk Political Science Building",
+  OwensFranklinHealthCenter = "Ownens Franklin Health Center",
+  LCAndersonHall = "LC Anderson Hall",
+  EvansHall = "Evans Hall",
+  WRBanksBuilding = "W.R Banks Building",
+  JohnBColemanLibrary = "John B. Coleman Library",
+  PrairieViewSeventhDayAdventistChurch = "Prairie View Seventh-day Adventist Church",
+  EEOBanionScienceBuilding = "E.E. O’Banion Science Building",
+  LeroyGMooreJrIntramuralGymnasium = "Leroy G. Moore Jr. Intramural Gymnasium",
+  WilliamJNicksBuilding = "William J. Nicks Building",
+  WillieATemptonMemorialStudentCenter = "Willie A. Tempton Memorial Student Center",
+  AIThomasAdministrationBuilding = "A.I. Thomas Administration Building",
+  HarringtonScienceBuilding = "Harrington Science Building",
+  ArchitectureBuilding = "Architecture Building",
+  HobartTaylorHall = "Hobart Taylor Hall",
+  PantherStadium = "Panther Stadium",
+  WelcomeCenter = "Welcome Center"
+}
