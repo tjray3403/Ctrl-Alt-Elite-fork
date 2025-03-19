@@ -1,9 +1,15 @@
 import React, { useRef, useEffect } from 'react';
-import MapView, { PROVIDER_DEFAULT } from 'react-native-maps';
+import MapView, { PROVIDER_DEFAULT, Marker } from 'react-native-maps';
 import { StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
 import { useNavigation } from 'expo-router';
+import { markers } from '../../assets/markers';
 
-
+interface MapMarker {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+}
 
 const INITIAL_REGION = {
 latitude: 30.0933,
@@ -47,8 +53,20 @@ const focusMap = () => {
       initialRegion={INITIAL_REGION}
       showsUserLocation
       showsMyLocationButton
+      showsPointsOfInterest={false}
       ref={mapRef}
-      />
+      >
+        {markers.map((marker: MapMarker) => (
+          <Marker
+            key={marker.id}
+            coordinate={{
+              latitude: marker.latitude,
+              longitude: marker.longitude
+            }}
+            title={marker.name}
+          />
+        ))}
+      </MapView>
     </View>
   );
 }
