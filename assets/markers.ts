@@ -1,12 +1,12 @@
 // This is a list of markers that will be used to populate the map
 // The markers are stored in an array of objects
-// Stored from top left to bottom right
+// Stored from top left to bottom right-ish
 export const markers = [
     {
         id: 1,
         name: "Henrietta T. Farrel Hall",
-        latitude: 30.09755882499947, 
-        longitude: -95.99185595497948,
+        latitude: 30.097437620066874,
+        longitude: -95.99242357815781 
     },
 
     {
@@ -26,8 +26,8 @@ export const markers = [
     {
         id: 4,
         name: "ENCARB",
-        latitude: 30.097749559884633,  
-        longitude: -95.98731057553383,
+        latitude: 30.09687713721229, 
+        longitude:-95.98754227727538
     },
 
     {
@@ -166,8 +166,8 @@ export const markers = [
     {
         id: 24,
         name: "Prairie View Seventh-day Adventist Church",
-        latitude: 30.09307305553159,
-        longitude:-95.98629487045885
+        latitude: 30.09316903020794,
+        longitude:-95.98685570876742
     },
 
     {
@@ -201,8 +201,8 @@ export const markers = [
     {
         id: 29,
         name: "A.I. Thomas Administration Building",
-        latitude: 30.092418936854322,
-        longitude: -95.98933780292873
+        latitude: 30.09240712087389,
+        longitude: -95.98947055644022
     },
 
     {
@@ -229,8 +229,14 @@ export const markers = [
     {
         id: 33,
         name: "Panther Stadium",
-        latitude: 30.091171274989396,
-        longitude: -95.99409612585588
+        latitude: 30.091112930456877,
+        longitude: -95.99426678225882
     },
 
+    {
+        id: 34,
+        name: "Welcome Center",
+        latitude: 30.089335182141106,
+        longitude: -95.98979743887637
+    }
 ]
