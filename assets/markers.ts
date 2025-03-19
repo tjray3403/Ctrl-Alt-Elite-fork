@@ -26,8 +26,8 @@ export const markers = [
     {
         id: 4,
         name: "ENCARB",
-        latitude: 30.09687713721229, 
-        longitude:-95.98754227727538
+        latitude: 30.09716250066886,
+        longitude:-95.98753263018077
     },
 
     {
