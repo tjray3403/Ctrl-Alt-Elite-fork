@@ -22,7 +22,7 @@ export default function HomeScreen() {
   const [nextClass, setNextClass] = useState<ClassItem | null>(null);
 
   useEffect(() => {
-    // ✅ Listen for auth state changes
+    //  Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
@@ -45,22 +45,22 @@ export default function HomeScreen() {
         const todayDate = moment().format('YYYY-MM-DD');
         const now = moment();
 
-        // ✅ Filter today's classes & find the next one
+        //  Filter today's classes & find the next one
         const todaysClasses = data.filter(classItem => {
-          if (!classItem.startTime) return false; // ✅ Ensure startTime exists
+          if (!classItem.startTime) return false; //  Ensure startTime exists
           return (!classItem.date || classItem.date === todayDate) &&
                  moment(classItem.startTime, "hh:mm A").isAfter(now);
         });
 
-        // ✅ Sort and get the first upcoming class
+        //  Sort and get the first upcoming class
         const sortedClasses = todaysClasses.sort((a, b) => {
           return moment(a.startTime, "hh:mm A").diff(moment(b.startTime, "hh:mm A"));
         });
 
         if (sortedClasses.length > 0) {
-          setNextClass(sortedClasses[0]); // ✅ Set next class
+          setNextClass(sortedClasses[0]); //  Set next class
         } else {
-          setNextClass(null); // ✅ No upcoming classes
+          setNextClass(null); //  No upcoming classes
         }
       } catch (err) {
         console.error('❌ Error fetching next class:', err);
@@ -79,7 +79,7 @@ export default function HomeScreen() {
         <Text style={styles.linkText}>Weather</Text>
       </Link>
 
-      {/* ✅ Display the next class */}
+      {/*  Display the next class */}
       {nextClass ? (
         <TouchableOpacity 
           style={styles.classCard} 
@@ -96,11 +96,11 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
       ) : (
-        // ✅ If no upcoming classes, show a message & options
+        //  If no upcoming classes, show a message & options
         <View style={styles.noClassContainer}>
           <Text style={styles.noClassText}>No upcoming classes today.</Text>
           
-          {/* ✅ Add Class Button */}
+          {/*  Add Class Button */}
           <TouchableOpacity 
             style={styles.addClassButton} 
             onPress={() => router.push('/class/add_class_screen')}
@@ -108,7 +108,7 @@ export default function HomeScreen() {
             <Text style={styles.buttonText}>➕ Add a Class</Text>
           </TouchableOpacity>
 
-          {/* ✅ View All Classes Button */}
+          {/*  View All Classes Button */}
           <TouchableOpacity 
             style={styles.viewClassesButton} 
             onPress={() => router.push('/class/list_classes_screen')}
@@ -125,7 +125,7 @@ export default function HomeScreen() {
   );
 }
 
-// ✅ Integrated Styles
+//  Integrated Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,

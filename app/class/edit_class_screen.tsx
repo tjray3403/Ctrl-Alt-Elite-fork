@@ -14,7 +14,7 @@ interface ClassData {
   roomNumber?: string;
   imageUrl?: string;
   note?: string;
-  startTime: string; // ✅ Added startTime
+  startTime: string; //  Added startTime
 }
 
 const EditClassScreen: React.FC = () => {
@@ -56,7 +56,7 @@ const EditClassScreen: React.FC = () => {
     fetchClass();
   }, [user, classId]);
 
-  // ✅ Handles Time Selection
+  //  Handles Time Selection
   const handleConfirmTime = (event: any, selectedTime?: Date) => {
     if (selectedTime && classData) {
       setSelectedDate(selectedTime);
@@ -155,10 +155,10 @@ const EditClassScreen: React.FC = () => {
         onChangeText={(text) => setClassData({ ...classData, roomNumber: text })}
       />
 
-      {/* ✅ Start Time */}
+      {/*  Start Time */}
       <Text style={styles.label}>Start Time *</Text>
       {Platform.OS === 'web' ? (
-        // ✅ Web: Use native HTML time input
+        //  Web: Use native HTML time input
         <TextInput
           style={styles.input}
           value={classData.startTime}
@@ -166,7 +166,7 @@ const EditClassScreen: React.FC = () => {
           placeholder="Select Time"
         />
       ) : (
-        // ✅ Mobile: Use native picker
+        //  Mobile: Use native picker
         <TouchableOpacity style={styles.input} onPress={() => setTimePickerVisible(true)}>
           <Text>{classData.startTime || 'Select Time'}</Text>
         </TouchableOpacity>
