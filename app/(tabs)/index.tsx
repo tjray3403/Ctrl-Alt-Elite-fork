@@ -86,7 +86,7 @@ export default function HomeScreen() {
           onPress={() => router.push(`/class/list_classes_screen`)}
         >
           <Image 
-            source={nextClass.imageUrl ? { uri: nextClass.imageUrl } : require('@/pantherpace_logo.jpg')} 
+            source={nextClass.imageUrl ? { uri: nextClass.imageUrl } : require('assests/images/pantherpace_logo.png')} 
             style={styles.classImage} 
           />
           <View style={styles.classInfoContainer}>
