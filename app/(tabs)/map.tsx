@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+/*import React, { useRef, useEffect } from 'react';
 import MapView, { PROVIDER_DEFAULT, Marker } from 'react-native-maps';
 import { StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
 import { useNavigation } from 'expo-router';
@@ -70,3 +70,4 @@ const focusMap = () => {
     </View>
   );
 }
+*/
