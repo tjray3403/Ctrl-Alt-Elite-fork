@@ -11,6 +11,7 @@ import moment from 'moment';
 import { Picker } from '@react-native-picker/picker';
 import {LocationName} from '../../config/building_names'
 import ImagePickerInput from '@/components/imagePickerInput';
+import DropDownList from '@/components/DropdownList';
 
 
 const AddClassScreen: React.FC = () => {
@@ -21,6 +22,7 @@ const AddClassScreen: React.FC = () => {
   const [name, setName] = useState('');
   const [professor, setProfessor] = useState('');
   const [building, setBuilding] = useState('');
+  const [selectedbuilding, setSelectedBuilding] = useState<string | null>(null);
   const [roomNumber, setRoomNumber] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [note, setNote] = useState('');
@@ -93,34 +95,25 @@ const AddClassScreen: React.FC = () => {
       <TextInput style={styles.input} value={professor} onChangeText={setProfessor} />
 
       <Text style={styles.label}>Building *</Text>
-      {Platform.OS === 'ios' ? (
-  <View style={styles.pickerIOS}>
-    <Picker
-      selectedValue={building}
-      onValueChange={(itemValue) => setBuilding(itemValue)}
-      style={styles.picker}
-      itemStyle={styles.pickerItem}
-    >
-      <Picker.Item label="Select a building" value="" />
-      {buildingOptions.map((option) => (
-        <Picker.Item key={option} label={option} value={option} />
-      ))}
-    </Picker>
-  </View>
-) : (
-  <View style={styles.pickerWrapper}>
-    <Picker
-      selectedValue={building}
-      onValueChange={(itemValue) => setBuilding(itemValue)}
-      style={styles.picker}
-    >
-      <Picker.Item label="Select a building" value="" />
-      {buildingOptions.map((option) => (
-        <Picker.Item key={option} label={option} value={option} />
-      ))}
-    </Picker>
-  </View>
-)}
+      <View style={{ flex: 1, padding: 16 , zIndex:3}}>
+            <Text style={{ marginBottom: 8 }}>Choose a building:</Text>
+      
+            <View style={{zIndex:4}}>
+            <DropDownList
+            
+                enumList={buildingOptions}
+                onSelect={(value) => {
+                  setSelectedBuilding(value);
+                  setBuilding(value);
+                } }
+                placeholder="Select a building" selectedValue={''}
+                          />
+                
+      </View>
+            <Text style={styles.selectedValue}>
+              Selected Building: {selectedbuilding}
+            </Text>
+          </View>
       <Text style={styles.label}>Room Number (Optional)</Text>
       <TextInput style={styles.input} value={roomNumber} onChangeText={setRoomNumber} />
 
@@ -133,7 +126,7 @@ const AddClassScreen: React.FC = () => {
           style={styles.input}
           value={startTime}
           onChangeText={(text) => setStartTime(text)}
-          placeholder="Select Time *(e.g. 5:00, 5:30)"
+          placeholder="Select Time *(e.g. 5:00 AM, 5:30 PM)"
         />
       ) : (
         //  Mobile: Use native picker
@@ -190,27 +183,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
     marginTop: 12 
   },
-  pickerWrapper: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
-  pickerIOS: {
-    height: 150,
-    justifyContent: 'center',
-  },
-  picker: {
-    height: 48,
-    width: '100%',
+  selectedValue: {
+    marginTop: 16,
+    fontSize: 14,
     color: '#333',
-    backgroundColor: '#fff',
-  },
-  pickerItem: {
-    fontSize: 16,
-    height: 44,
   },
   pickerContainer: {
     backgroundColor: '#fff', 
