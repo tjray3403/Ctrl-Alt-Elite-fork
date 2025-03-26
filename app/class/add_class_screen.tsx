@@ -8,6 +8,10 @@ import { getAuth } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker'; //  Works for iOS & Android
 import moment from 'moment';
+import { Picker } from '@react-native-picker/picker';
+import {LocationName} from '../../config/building_names'
+import ImagePickerInput from '@/components/imagePickerInput';
+
 
 const AddClassScreen: React.FC = () => {
   const auth = getAuth();
@@ -24,6 +28,8 @@ const AddClassScreen: React.FC = () => {
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
+
+  const buildingOptions = Object.values(LocationName);
 
   //  Handles time selection across platforms
   const handleConfirmTime = (event: any, selectedTime?: Date) => {
@@ -87,13 +93,39 @@ const AddClassScreen: React.FC = () => {
       <TextInput style={styles.input} value={professor} onChangeText={setProfessor} />
 
       <Text style={styles.label}>Building *</Text>
-      <TextInput style={styles.input} value={building} onChangeText={setBuilding} />
-
+      {Platform.OS === 'ios' ? (
+  <View style={styles.pickerIOS}>
+    <Picker
+      selectedValue={building}
+      onValueChange={(itemValue) => setBuilding(itemValue)}
+      style={styles.picker}
+      itemStyle={styles.pickerItem}
+    >
+      <Picker.Item label="Select a building" value="" />
+      {buildingOptions.map((option) => (
+        <Picker.Item key={option} label={option} value={option} />
+      ))}
+    </Picker>
+  </View>
+) : (
+  <View style={styles.pickerWrapper}>
+    <Picker
+      selectedValue={building}
+      onValueChange={(itemValue) => setBuilding(itemValue)}
+      style={styles.picker}
+    >
+      <Picker.Item label="Select a building" value="" />
+      {buildingOptions.map((option) => (
+        <Picker.Item key={option} label={option} value={option} />
+      ))}
+    </Picker>
+  </View>
+)}
       <Text style={styles.label}>Room Number (Optional)</Text>
       <TextInput style={styles.input} value={roomNumber} onChangeText={setRoomNumber} />
 
       {/*  Cross-platform Time Picker */}
-      <Text style={styles.label}>Start Time *</Text>
+      <Text style={styles.label}>Start Time * </Text>
 
       {Platform.OS === 'web' ? (
         //  Web: Use native HTML time input
@@ -101,7 +133,7 @@ const AddClassScreen: React.FC = () => {
           style={styles.input}
           value={startTime}
           onChangeText={(text) => setStartTime(text)}
-          placeholder="Select Time"
+          placeholder="Select Time *(e.g. 5:00, 5:30)"
         />
       ) : (
         //  Mobile: Use native picker
@@ -126,7 +158,15 @@ const AddClassScreen: React.FC = () => {
       )}
 
       <Text style={styles.label}>Image URL (Optional)</Text>
-      <TextInput style={styles.input} value={imageUrl} onChangeText={setImageUrl} />
+      <TextInput
+      style={styles.input}
+      value={imageUrl}
+      onChangeText={(text) => setImageUrl(text)}
+      placeholder="Paste image URL or upload below"/>
+    <ImagePickerInput
+      label="Upload Image"
+      imageUrl={imageUrl}
+      onChange={(uri) => setImageUrl(uri)}/>
 
       <Text style={styles.label}>Note (Optional)</Text>
       <TextInput style={styles.input} value={note} onChangeText={setNote} />
@@ -149,6 +189,28 @@ const styles = StyleSheet.create({
   label: { 
     fontWeight: 'bold', 
     marginTop: 12 
+  },
+  pickerWrapper: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    marginBottom: 16,
+    overflow: 'hidden',
+  },
+  pickerIOS: {
+    height: 150,
+    justifyContent: 'center',
+  },
+  picker: {
+    height: 48,
+    width: '100%',
+    color: '#333',
+    backgroundColor: '#fff',
+  },
+  pickerItem: {
+    fontSize: 16,
+    height: 44,
   },
   pickerContainer: {
     backgroundColor: '#fff', 
@@ -182,5 +244,23 @@ const styles = StyleSheet.create({
   error: { 
     color: 'red', 
     marginVertical: 8 
+  },
+  uploadButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  uploadButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  imagePreview: {
+    width: '100%',
+    height: 180,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
 });

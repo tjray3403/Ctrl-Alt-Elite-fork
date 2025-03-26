@@ -6,6 +6,10 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import {LocationName} from '../../config/building_names'
+import { Picker } from '@react-native-picker/picker';
+import ImagePickerInput from '@/components/imagePickerInput';
+
 
 interface ClassData {
   name: string;
@@ -27,6 +31,8 @@ const EditClassScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const buildingOptions = Object.values(LocationName);
+
 
   useEffect(() => {
     if (!user || !classId) return;
@@ -142,11 +148,40 @@ const EditClassScreen: React.FC = () => {
       />
 
       <Text style={styles.label}>Building</Text>
-      <TextInput
-        style={styles.input}
-        value={classData.building}
-        onChangeText={(text) => setClassData({ ...classData, building: text })}
-      />
+      <Text style={styles.label}>Building</Text>
+<View style={styles.pickerWrapper}>
+  {Platform.OS === 'ios' ? (
+    <View style={styles.pickerIOS}>
+      <Picker
+        selectedValue={classData.building}
+        onValueChange={(value) =>
+          setClassData({ ...classData, building: value as LocationName })
+        }
+        style={styles.picker}
+        itemStyle={styles.pickerItem}
+      >
+        <Picker.Item label="Select a building" value="" />
+        {buildingOptions.map((option) => (
+          <Picker.Item key={option} label={option} value={option} />
+        ))}
+      </Picker>
+    </View>
+  ) : (
+    <Picker
+      selectedValue={classData.building}
+      onValueChange={(value) =>
+        setClassData({ ...classData, building: value as LocationName })
+      }
+      style={styles.picker}
+    >
+      <Picker.Item label="Select a building" value="" />
+      {buildingOptions.map((option) => (
+        <Picker.Item key={option} label={option} value={option} />
+      ))}
+    </Picker>
+  )}
+</View>
+
 
       <Text style={styles.label}>Room Number (Optional)</Text>
       <TextInput
@@ -156,14 +191,14 @@ const EditClassScreen: React.FC = () => {
       />
 
       {/*  Start Time */}
-      <Text style={styles.label}>Start Time *</Text>
+      <Text style={styles.label}>Start Time * </Text>
       {Platform.OS === 'web' ? (
         //  Web: Use native HTML time input
         <TextInput
           style={styles.input}
           value={classData.startTime}
           onChangeText={(text) => setClassData({ ...classData, startTime: text })}
-          placeholder="Select Time"
+          placeholder="Select Time *(e.g. 5:00, 5:30)"
         />
       ) : (
         //  Mobile: Use native picker
@@ -186,11 +221,21 @@ const EditClassScreen: React.FC = () => {
       )}
 
       <Text style={styles.label}>Image URL (Optional)</Text>
-      <TextInput
-        style={styles.input}
-        value={classData.imageUrl || ''}
-        onChangeText={(text) => setClassData({ ...classData, imageUrl: text })}
-      />
+      <Text style={styles.label}>Image (Optional)</Text>
+<TextInput
+  style={styles.input}
+  value={classData.imageUrl || ''}
+  onChangeText={(text) => setClassData({ ...classData, imageUrl: text })}
+  placeholder="Paste image URL or upload below"
+/>
+<ImagePickerInput
+  label="Upload Image"
+  imageUrl={classData.imageUrl || ''}
+  onChange={(uri) => setClassData({ ...classData, imageUrl: uri })}
+/>
+
+
+      
 
       <Text style={styles.label}>Note (Optional)</Text>
       <TextInput
@@ -212,6 +257,28 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',
+  },
+  pickerWrapper: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    marginBottom: 16,
+    overflow: 'hidden',
+  },
+  pickerIOS: {
+    height: 150,
+    justifyContent: 'center',
+  },
+  picker: {
+    height: 48,
+    width: '100%',
+    color: '#333',
+    backgroundColor: '#fff',
+  },
+  pickerItem: {
+    fontSize: 16,
+    height: 44,
   },
   pickerContainer: {
     backgroundColor: '#fff',  
@@ -240,5 +307,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'red',
     textAlign: 'center',
+  },
+  uploadButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  uploadButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  imagePreview: {
+    width: '100%',
+    height: 180,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
 });
