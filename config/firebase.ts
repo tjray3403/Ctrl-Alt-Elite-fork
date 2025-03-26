@@ -15,14 +15,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-// ✅ Set persistence for React Native (uses browserLocalPersistence)
-setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log("✅ Firebase Auth Persistence Enabled");
-  })
-  .catch((error) => {
-    console.error("❌ Error setting auth persistence:", error);
-  });
+
 
 
 const db = getFirestore(app);
