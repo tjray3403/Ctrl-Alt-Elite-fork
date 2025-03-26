@@ -8,23 +8,47 @@ const INITIAL_REGION = {
   longitude: -95.9877,
   latitudeDelta: 0.005,
   longitudeDelta: 0.005,
+  latitude: 30.0933,
+  longitude: -95.9877,
+  latitudeDelta: 0.005,
+  longitudeDelta: 0.005,
 };
 
 export default function App() {
-  const mapRef = useRef<any>();
-  const navigation = useNavigation();
+  const [MapView, setMapView] = useState<any>(null); // State to hold the dynamic import of MapView
+  const [Marker, setMarker] = useState<any>(null); // State to hold the dynamic import of Marker
+  const [PROVIDER_GOOGLE, setProviderGoogle] = useState<any>(null); // State to hold PROVIDER_DEFAULT
 
   useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={focusMap}>
-          <View style={{ padding: 10 }}>
-            <Text>Next Class</Text>
-          </View>
-        </TouchableOpacity>
-      ),
-    });
+    
+      const {
+        default: MapView,
+        Marker,
+        PROVIDER_GOOGLE,
+      } = require("react-native-maps");
+      setMapView(MapView);
+      setMarker(Marker);
+      setProviderGoogle(PROVIDER_GOOGLE);
+    
   }, []);
+
+  const navigation = useNavigation();
+  const mapRef = useRef<any>();
+
+  const windowWidth = Dimensions.get("window").width;
+    useEffect(() => {
+    if (Platform.OS !== "web") {
+        navigation.setOptions({
+          headerRight: () => (
+            <TouchableOpacity onPress={focusMap}>
+              <View style={{  padding: 10  }}>
+                  <Text>Next Class</Text>
+              </View>
+            </TouchableOpacity>
+          ),,
+        });
+    }
+    }, [navigation]);
 
   const focusMap = () => {
     const SRCollins = {
