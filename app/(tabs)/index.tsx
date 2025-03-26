@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import { useRouter, Link } from "expo-router";
 import { db } from "@/config/firebase";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
@@ -98,20 +105,28 @@ export default function HomeScreen() {
   }, [user]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        justifyContent: "flex-start",
+        paddingBottom: 20, // Add padding to prevent overlap at the bottom
+      }}
+      style={[styles.container, { minHeight: "100vh", overflowY: "scroll" }]} // Use overflowY: "scroll" for web scrolling
+    >
       <Image
         source={require("../../assets/images/panther-pace-logo-clear.png")}
         style={styles.logo}
       />
       <Text style={styles.greeting}>Hi, {userName || "Student"}!</Text>
-      <Text style={styles.title}>🏡 Hi, {userName || "Loading..."}</Text>
-      <Text style={styles.profileInfo}>Welcome to the Panther Pace App!</Text>
+
+      {/*<Text style={styles.profileInfo}>Welcome to the Panther Pace App!</Text>
 
       <Link style={styles.link} href={"/(tabs)/weather"}>
         <Text style={styles.linkText}>Weather</Text>
       </Link>
+        */}
 
-      {/*  Display the next class */}
+      {/* Display the next class */}
       {nextClass ? (
         <TouchableOpacity
           style={styles.classCard}
@@ -136,11 +151,11 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
       ) : (
-        //  If no upcoming classes, show a message & options
+        // If no upcoming classes, show a message & options
         <View style={styles.noClassContainer}>
           <Text style={styles.noClassText}>No upcoming classes today.</Text>
 
-          {/*  Add Class Button */}
+          {/* Add Class Button */}
           <TouchableOpacity
             style={styles.addClassButton}
             onPress={() => router.push("/class/add_class_screen")}
@@ -148,7 +163,7 @@ export default function HomeScreen() {
             <Text style={styles.buttonText}>➕ Add a Class</Text>
           </TouchableOpacity>
 
-          {/*  View All Classes Button */}
+          {/* View All Classes Button */}
           <TouchableOpacity
             style={styles.viewClassesButton}
             onPress={() => router.push("/class/list_classes_screen")}
@@ -158,10 +173,72 @@ export default function HomeScreen() {
         </View>
       )}
 
-      <TouchableOpacity style={styles.primaryButton}>
+      {/*<TouchableOpacity style={styles.primaryButton}>
         <Text style={styles.buttonText}>Start Workout</Text>
-      </TouchableOpacity>
-    </View>
+      </TouchableOpacity> */}
+      <View
+        style={[
+          styles.buttonsContainer,
+          {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "space-around",
+          },
+        ]}
+      >
+        <View style={styles.weatherContainer}>
+          <Text style={styles.containerButtonText}>Weather</Text>
+          <Link style={styles.weatherTile} href={"/(tabs)/weather"}>
+            <Image
+              source={require("../../assets/images/weatherButtonIcon.png")}
+              style={[
+                styles.icon,
+                { width: "100%", height: "100%", borderRadius: 30 },
+              ]} // Adjusted size to fill the circle
+            />
+          </Link>
+        </View>
+
+        <View style={styles.waterContainer}>
+          <Text style={styles.containerButtonText}>Water</Text>
+          <Link style={styles.waterTile} href={"/(tabs)/weather"}>
+            <Image
+              source={require("../../assets/images/weatherButtonIcon.png")}
+              style={[
+                styles.icon,
+                { width: "100%", height: "100%", borderRadius: 30 },
+              ]} // Adjusted size to fill the circle
+            />
+          </Link>
+        </View>
+
+        <View style={styles.stepsContainer}>
+          <Text style={styles.containerButtonText}>Steps</Text>
+          <Link style={styles.stepsTile} href={"/(tabs)/weather"}>
+            <Image
+              source={require("../../assets/images/weatherButtonIcon.png")}
+              style={[
+                styles.icon,
+                { width: "100%", height: "100%", borderRadius: 30 },
+              ]} // Adjusted size to fill the circle
+            />
+          </Link>
+        </View>
+
+        <View style={styles.sleepContainer}>
+          <Text style={styles.containerButtonText}>Sleep</Text>
+          <Link style={styles.sleepTile} href={"/(tabs)/weather"}>
+            <Image
+              source={require("../../assets/images/weatherButtonIcon.png")}
+              style={[
+                styles.icon,
+                { width: "100%", height: "100%", borderRadius: 30 },
+              ]} // Adjusted size to fill the circle
+            />
+          </Link>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -169,33 +246,35 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#fff", // Sky blue background color
     padding: 16,
-    alignItems: "center",
   },
   logo: {
     width: 150,
     height: 50,
     resizeMode: "contain",
-    alignSelf: "flex-end",
-    marginBottom: 10,
+    position: "absolute", // Position the logo absolutely
+    top: 10, // Add some spacing from the top
+    right: 10, // Add some spacing from the right
   },
   greeting: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
+    textAlign: "left", // Align text to the left
+    alignSelf: "flex-start", // Align greeting to the left
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 10,
-    textAlign: "center",
+    textAlign: "center", // Center align text
   },
   profileInfo: {
     fontSize: 16,
     color: "#666",
     marginBottom: 20,
-    textAlign: "center",
+    textAlign: "center", // Center align text
   },
   link: {
     backgroundColor: "#007bff",
@@ -203,6 +282,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 5,
     marginBottom: 20,
+    alignSelf: "center", // Center align link
+  },
+  containerButtonText: {
+    color: "#007bff",
+    fontSize: 16,
+    fontWeight: "bold",
+    alignSelf: "center", // Center align text
+    bottom: 3,
   },
   linkText: {
     color: "#fff",
@@ -222,6 +309,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     width: "90%",
     marginBottom: 20,
+    alignSelf: "center", // Center align card
   },
   classImage: {
     width: 60,
@@ -237,23 +325,27 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#333",
+    textAlign: "left", // Align text to the left
   },
   classTime: {
     fontSize: 14,
     color: "#666",
+    textAlign: "left", // Align text to the left
   },
   classBuilding: {
     fontSize: 14,
     color: "#666",
+    textAlign: "left", // Align text to the left
   },
   noClassContainer: {
-    alignItems: "center",
+    alignItems: "center", // Center align container
     marginTop: 20,
   },
   noClassText: {
     fontSize: 16,
     color: "#999",
     marginBottom: 10,
+    textAlign: "center", // Center align text
   },
   addClassButton: {
     backgroundColor: "#007bff",
@@ -261,12 +353,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 5,
     marginBottom: 10,
+    alignSelf: "center", // Center align button
   },
   viewClassesButton: {
     backgroundColor: "#28a745",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    // Center align button
   },
   primaryButton: {
     backgroundColor: "#28a745",
@@ -281,15 +375,95 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-  statTile: {
-    width: "45%",
-    backgroundColor: "#fff",
-    borderRadius: 15,
+  buttonsContainer: {
+    position: "absolute", // Position the container absolutely
+    bottom: 10, // Align it to the bottom of the screen
+    alignSelf: "center", // Center the container horizontally
+    width: "100%", // Take up all the width of the screen
+    height: "50%",
+    borderRightWidth: 1,
+    borderRightColor: "black",
+    borderLeftWidth: 1,
+    borderLeftColor: "black",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: "black",
+    borderTopColor: "black",
+  },
+  weatherContainer: {
+    position: "absolute",
+    bottom: 30,
+    right: 40,
+  },
+  weatherTile: {
+    width: 120, // Increased width
+    height: 120, // Increased height
+    backgroundColor: "#87ceeb",
+    borderRadius: 60, // Make it circular by setting borderRadius to half of width/height
     padding: 15,
     alignItems: "center",
-    marginBottom: 15,
+    justifyContent: "center", // Center content inside the circle
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 10,
+  },
+
+  waterContainer: {
+    position: "absolute",
+    bottom: 30,
+    left: 40,
+  },
+  waterTile: {
+    width: 120, // Increased width
+    height: 120, // Increased height
+    backgroundColor: "#87ceeb",
+    borderRadius: 60, // Make it circular by setting borderRadius to half of width/height
+    padding: 15,
+    alignItems: "center",
+    justifyContent: "center", // Center content inside the circle
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+  },
+
+  stepsContainer: {
+    position: "absolute",
+    top: 30,
+    left: 40,
+  },
+  stepsTile: {
+    width: 120, // Increased width
+    height: 120, // Increased height
+    backgroundColor: "#87ceeb",
+    borderRadius: 60, // Make it circular by setting borderRadius to half of width/height
+    padding: 15,
+    alignItems: "center",
+    justifyContent: "center", // Center content inside the circle
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+  },
+
+  sleepContainer: {
+    position: "absolute",
+    top: 30,
+    right: 40,
+  },
+  sleepTile: {
+    width: 120, // Increased width
+    height: 120, // Increased height
+    backgroundColor: "#87ceeb",
+    borderRadius: 60, // Make it circular by setting borderRadius to half of width/height
+    padding: 15,
+    alignItems: "center",
+    justifyContent: "center", // Center content inside the circle
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+  },
+  icon: {
+    width: 60,
+    height: 60,
+    marginBottom: 10,
   },
 });

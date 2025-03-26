@@ -1,5 +1,5 @@
 /*import React, { useRef, useEffect } from 'react';
-import MapView, { PROVIDER_DEFAULT, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
 import { useNavigation } from 'expo-router';
 import { markers } from '../../config/markers';
@@ -21,18 +21,18 @@ const INITIAL_REGION = {
 export default function App() {
   const [MapView, setMapView] = useState<any>(null); // State to hold the dynamic import of MapView
   const [Marker, setMarker] = useState<any>(null); // State to hold the dynamic import of Marker
-  const [PROVIDER_DEFAULT, setProviderDefault] = useState<any>(null); // State to hold PROVIDER_DEFAULT
+  const [PROVIDER_GOOGLE, setProviderGoogle] = useState<any>(null); // State to hold PROVIDER_DEFAULT
 
   useEffect(() => {
     
       const {
         default: MapView,
         Marker,
-        PROVIDER_DEFAULT,
+        PROVIDER_GOOGLE,
       } = require("react-native-maps");
       setMapView(MapView);
       setMarker(Marker);
-      setProviderDefault(PROVIDER_DEFAULT);
+      setProviderGoogle(PROVIDER_GOOGLE);
     
   }, []);
 
@@ -73,7 +73,7 @@ export default function App() {
     );
   }
 
-  if (!MapView || !Marker || !PROVIDER_DEFAULT) {
+  if (!MapView || !Marker || !PROVIDER_GOOGLE) {
     // Return loading screen until dynamic imports are loaded
     return (
       <View style={styles.loadingContainer}>
@@ -83,11 +83,11 @@ export default function App() {
   }
 
   return (
-    { windowWidth < 500 ? 
-    (<View style={{ flex: 1 }}>
+    
+    <View style={{ flex: 1 }}>
       <MapView
         style={StyleSheet.absoluteFill}
-        provider={PROVIDER_DEFAULT}
+        provider={PROVIDER_GOOGLE}
         initialRegion={INITIAL_REGION}
         showsUserLocation
         showsMyLocationButton
@@ -105,8 +105,8 @@ export default function App() {
           />
         ))}
       </MapView>
-    </View>):(
-      <View><Text> "Web is not supported</Text></View>)}
+    </View>
   );
 }
 */
+
