@@ -68,7 +68,7 @@ const ListClassesScreen: React.FC = () => {
     if (editMode) {
       router.push(`/class/edit_class_screen?classId=${classId}`);
     } else {
-      router.push(`/class/class_detail_screen?classId=${classId}`);
+      //router.push(`/class/class_detail_screen?classId=${classId}`);
     }
   };
 
@@ -96,7 +96,10 @@ const ListClassesScreen: React.FC = () => {
             onPress={() => handleClassSelect(item.id)}
           >
             <Image
-              source={item.imageUrl ? { uri: item.imageUrl } : require('@/logo-login.png')}
+              source={item.imageUrl 
+                ? { uri: item.imageUrl } 
+                : require('../../assets/images/logo-login.png')}
+              
               style={styles.cardImage}
             />
             <View style={styles.cardContent}>

@@ -78,6 +78,9 @@ export default function HomeScreen() {
       <Link style={styles.link} href={"/(tabs)/weather"}>
         <Text style={styles.linkText}>Weather</Text>
       </Link>
+      <Link style={styles.link} href={"/Water_tracking/Water"}>
+        <Text style={styles.linkText}>Water Tracker</Text>
+      </Link>
 
       {/*  Display the next class */}
       {nextClass ? (

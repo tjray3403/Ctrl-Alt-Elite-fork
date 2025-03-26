@@ -8,7 +8,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#FFD700", // Gold for active tab
-        tabBarInactiveTintColor: "white", // Dark Gold for inactive
+        tabBarInactiveTintColor: "white", // White for inactive
         tabBarStyle: {
           backgroundColor: "#6A0DAD", // Purple background
           borderTopColor: "#FFD700", // Gold border at the top
