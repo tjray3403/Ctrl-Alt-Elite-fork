@@ -11,7 +11,7 @@ const TypingEffect: React.FC<{ text?: string }> = ({ text = "" }) => {
     if (!text) return; 
 
     setDisplayedText(""); 
-    let index = 0;
+    let index = 0; 
 
     const interval = setInterval(() => {
       setDisplayedText((prev) => {

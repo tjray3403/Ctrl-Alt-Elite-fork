@@ -172,10 +172,47 @@ export const styles = StyleSheet.create({
     color: "#000",
     marginLeft: 10,
     outlineColor: "transparent",
-    outlineWidth: 0,
   },
+  
   logoLogin: {
     width: 285,
     height: 116,
   },
+
+  recommendation_input: {
+    width: "90%",
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: "#EAEAEA",
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 15,
+  },
+  recommendation_button: {
+    backgroundColor: "#8A56AC",
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+
+  recommendation_buttonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  recommendation_suggestionBox: {
+    backgroundColor: "#E8D7F1",
+    padding: 15,
+    borderRadius: 15,
+    width: "90%",
+    marginTop: 15,
+    textAlign: "center",
+  },
+  recommendation_suggestionText: {
+    fontSize: 16,
+    color: "#5B2E8F",
+    fontWeight: "500",
+    textAlign: "center",
+  }
 });
