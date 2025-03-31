@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Image,
+} from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../config/firebase";
@@ -12,8 +19,16 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSignup = async () => {
+    setErrorMessage("");
+    console.log("🟢 Register button clicked");
+    if (!email || !password || !name) {
+      setErrorMessage("❌ Please fill in all fields.");
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -21,51 +36,71 @@ export default function Signup() {
         password
       );
       const user = userCredential.user;
-
       await setDoc(doc(db, "users", user.uid), { name, email });
-
       Alert.alert("✅ Signup Success", "Account created successfully!");
       router.replace("/(tabs)/profile");
-    } catch (error) {
-      Alert.alert("❌ Signup Failed", (error as any).message);
+    } catch (error: any) {
+      console.log("❌ Signup Error:", error);
+      setErrorMessage(error.message || "❌ Signup failed. Try again.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create account</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[styles.input, { paddingLeft: 0, marginLeft: 0 }]}
-          placeholder="Name"
-          placeholderTextColor={"#A6A6A6"}
-          value={name}
-          onChangeText={setName}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[styles.input, { paddingLeft: 0, marginLeft: 0 }]}
-          placeholder="Email"
-          placeholderTextColor={"#A6A6A6"}
-          value={email}
-          onChangeText={setEmail}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[styles.input, { paddingLeft: 0, marginLeft: 0 }]}
-          placeholderTextColor={"#A6A6A6"}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
+      {errorMessage ? (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      ) : null}
+
+      <View style={{ marginBottom: 20 }}>
+        <Image
+          source={require("../../assets/images/logo-login.png")}
+          width={285}
+          height={116}
+          style={styles.logoLogin}
         />
       </View>
 
-      <TouchableOpacity onPress={handleSignup} style={styles.primaryButton}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
+      <View style={styles.formContainer}>
+        <View style={styles.inputContainer}>
+          {/* Optional icon */}
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            placeholderTextColor={"#A6A6A6"}
+            value={name}
+            onChangeText={setName}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          {/* Optional icon */}
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor={"#A6A6A6"}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          {/* Optional icon */}
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor={"#A6A6A6"}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </View>
+
+        <TouchableOpacity onPress={handleSignup} style={styles.primaryButton}>
+          <Text style={styles.buttonText}>Register</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>Already have an account?</Text>

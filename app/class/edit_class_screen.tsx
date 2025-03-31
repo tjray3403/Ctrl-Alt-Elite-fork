@@ -1,3 +1,4 @@
+// ✅ edit_class_screen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Platform } from 'react-native';
 import { db } from '@/config/firebase';
@@ -18,7 +19,7 @@ interface ClassData {
   roomNumber?: string;
   imageUrl?: string;
   note?: string;
-  startTime: string; //  Added startTime
+  startTime: string;
 }
 
 const EditClassScreen: React.FC = () => {
@@ -37,8 +38,6 @@ const EditClassScreen: React.FC = () => {
 
   useEffect(() => {
     if (!user || !classId) return;
-
-    console.log("Received classId from params:", classId);
 
     const fetchClass = async () => {
       try {
@@ -63,7 +62,6 @@ const EditClassScreen: React.FC = () => {
     fetchClass();
   }, [user, classId]);
 
-  //  Handles Time Selection
   const handleConfirmTime = (event: any, selectedTime?: Date) => {
     if (selectedTime && classData) {
       setSelectedDate(selectedTime);
@@ -117,9 +115,14 @@ const EditClassScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading class data...</Text>
+      <View style={styles.container}>
+        <TouchableOpacity onPress={() => router.replace('/profile')}>
+          <Text style={styles.backButton}>← Home</Text>
+        </TouchableOpacity>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text>Loading class data...</Text>
+        </View>
       </View>
     );
   }
@@ -131,22 +134,29 @@ const EditClassScreen: React.FC = () => {
       </View>
     );
   }
+  
+  
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.label}>Class Name</Text>
-      <TextInput
-        style={styles.input}
-        value={classData.name}
-        onChangeText={(text) => setClassData({ ...classData, name: text })}
-      />
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => router.replace('/')}>
+        <Text style={styles.backButton}>← Home</Text>
+      </TouchableOpacity>
 
-      <Text style={styles.label}>Professor (Optional)</Text>
-      <TextInput
-        style={styles.input}
-        value={classData.professor || ''}
-        onChangeText={(text) => setClassData({ ...classData, professor: text })}
-      />
+      <ScrollView>
+        <Text style={styles.label}>Class Name</Text>
+        <TextInput
+          style={styles.input}
+          value={classData.name}
+          onChangeText={(text) => setClassData({ ...classData, name: text })}
+        />
+
+        <Text style={styles.label}>Professor (Optional)</Text>
+        <TextInput
+          style={styles.input}
+          value={classData.professor || ''}
+          onChangeText={(text) => setClassData({ ...classData, professor: text })}
+        />
 
       <Text style={styles.label}>Building</Text>
       <View style={{ flex: 1, padding: 16 , zIndex:3}}>
@@ -170,12 +180,12 @@ const EditClassScreen: React.FC = () => {
     </View>
 
 
-      <Text style={styles.label}>Room Number (Optional)</Text>
-      <TextInput
-        style={styles.input}
-        value={classData.roomNumber || ''}
-        onChangeText={(text) => setClassData({ ...classData, roomNumber: text })}
-      />
+        <Text style={styles.label}>Room Number (Optional)</Text>
+        <TextInput
+          style={styles.input}
+          value={classData.roomNumber || ''}
+          onChangeText={(text) => setClassData({ ...classData, roomNumber: text })}
+        />
 
       {/*  Start Time */}
       <Text style={styles.label}>Start Time * </Text>
@@ -194,18 +204,17 @@ const EditClassScreen: React.FC = () => {
         </TouchableOpacity>
       )}
 
-      {Platform.OS !== 'web' && isTimePickerVisible && (
-        <View style={styles.pickerContainer}> 
-        <DateTimePicker
-          value={selectedDate || new Date()}
-          mode="time"
-          is24Hour={false}
-          display="spinner"
-          textColor="black"
-          onChange={handleConfirmTime}
-        />
-        </View>
-      )}
+        {Platform.OS !== 'web' && isTimePickerVisible && (
+          <View style={styles.pickerContainer}>
+            <DateTimePicker
+              value={selectedDate || new Date()}
+              mode="time"
+              is24Hour={false}
+              display="spinner"
+              onChange={handleConfirmTime}
+            />
+          </View>
+        )}
 
       <Text style={styles.label}>Image URL (Optional)</Text>
       <Text style={styles.label}>Image (Optional)</Text>
@@ -224,16 +233,17 @@ const EditClassScreen: React.FC = () => {
 
       
 
-      <Text style={styles.label}>Note (Optional)</Text>
-      <TextInput
-        style={styles.input}
-        value={classData.note || ''}
-        onChangeText={(text) => setClassData({ ...classData, note: text })}
-      />
+        <Text style={styles.label}>Note (Optional)</Text>
+        <TextInput
+          style={styles.input}
+          value={classData.note || ''}
+          onChangeText={(text) => setClassData({ ...classData, note: text })}
+        />
 
-      <Button title="Update Class" onPress={handleUpdateClass} color="green" />
-      <Button title="Delete Class" onPress={handleDeleteClass} color="red" />
-    </ScrollView>
+        <Button title="Update Class" onPress={handleUpdateClass} color="green" />
+        <Button title="Delete Class" onPress={handleDeleteClass} color="red" />
+      </ScrollView>
+    </View>
   );
 };
 
@@ -247,7 +257,7 @@ const styles = StyleSheet.create({
   },
   
   pickerContainer: {
-    backgroundColor: '#fff',  
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
     alignItems: 'center',
@@ -296,5 +306,11 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#ccc',
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#007bff',
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
 });

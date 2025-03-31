@@ -1,7 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, setPersistence, browserLocalPersistence  } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCQmDwCRRJboKs454At-cd8nEZa6CnAnWA",
@@ -19,8 +18,6 @@ const auth = getAuth(app);
 
 
 const db = getFirestore(app);
-
-console.log("🔥 Firebase Initialized:", app.name);
 
 export { auth, db };
 export default app;
