@@ -111,7 +111,7 @@ export default function HomeScreen() {
         justifyContent: "flex-start",
         paddingBottom: 20, // Add padding to prevent overlap at the bottom
       }}
-      style={[styles.container, { minHeight: "100vh", overflowY: "scroll" }]} // Use overflowY: "scroll" for web scrolling
+      style={[styles.container, { flex: 1 }]} // Adjusted for React Native compatibility
     >
       <Image
         source={require("../../assets/images/panther-pace-logo-clear.png")}
