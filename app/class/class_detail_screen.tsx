@@ -1,10 +1,10 @@
+// ✅ class_detail_screen.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Platform  } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
 import { db } from '@/config/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
-
 
 interface ClassData {
   name: string;
@@ -18,7 +18,8 @@ interface ClassData {
 const ClassDetailScreen: React.FC = () => {
   const auth = getAuth();
   const user = auth.currentUser;
-  const { classId } = useLocalSearchParams(); // ✅ Correct way to get classId
+  const { classId } = useLocalSearchParams();
+  const router = useRouter();
   const [classData, setClassData] = useState<ClassData | null>(null);
 
   useEffect(() => {
@@ -51,28 +52,32 @@ const ClassDetailScreen: React.FC = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Top image / banner */}
-      <Image
-        source={classData.imageUrl ? { uri: classData.imageUrl } : require('@/pantherpace_logo.jpg')}
-        style={styles.bannerImage}
-      />
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => router.replace('/')}>
+        <Text style={styles.backButton}>← Home</Text>
+      </TouchableOpacity>
 
-      <View style={styles.detailsContainer}>
-        <Text style={styles.classTitle}>{classData.name}</Text>
-        {classData.professor && <Text style={styles.classInfo}>Professor: {classData.professor}</Text>}
-        <Text style={styles.classInfo}>Building: {classData.building}</Text>
-        {classData.roomNumber && <Text style={styles.classInfo}>Room: {classData.roomNumber}</Text>}
+      <ScrollView style={styles.container}>
+        <Image
+          source={classData.imageUrl ? { uri: classData.imageUrl } : require('@/pantherpace_logo.jpg')}
+          style={styles.bannerImage}
+        />
 
-        {/* Notes */}
-        {classData.note && (
-          <View style={styles.noteContainer}>
-            <Text style={styles.subtitle}>Note:</Text>
-            <Text style={styles.noteText}>{classData.note}</Text>
-          </View>
-        )}
-      </View>
-    </ScrollView>
+        <View style={styles.detailsContainer}>
+          <Text style={styles.classTitle}>{classData.name}</Text>
+          {classData.professor && <Text style={styles.classInfo}>Professor: {classData.professor}</Text>}
+          <Text style={styles.classInfo}>Building: {classData.building}</Text>
+          {classData.roomNumber && <Text style={styles.classInfo}>Room: {classData.roomNumber}</Text>}
+
+          {classData.note && (
+            <View style={styles.noteContainer}>
+              <Text style={styles.subtitle}>Note:</Text>
+              <Text style={styles.noteText}>{classData.note}</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -82,33 +87,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    
-    // ✅ iOS Shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-
-    // ✅ Android Shadow
     elevation: 4,
-
-    // ✅ Web Shadow (Uses CSS)
     ...Platform.select({
       web: {
         shadowColor: 'rgba(0, 0, 0, 0.2)',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 1,
         shadowRadius: 10,
-        // This is the equivalent of `box-shadow` in CSS
         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
       },
     }),
-
   },
   bannerImage: {
     width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
+    height: 200,
+    resizeMode: 'cover',
   },
   detailsContainer: {
     alignItems: 'center',
@@ -134,5 +131,11 @@ const styles = StyleSheet.create({
   noteText: {
     fontSize: 14,
     marginTop: 4,
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#007bff',
+    fontWeight: 'bold',
+    margin: 16,
   },
 });

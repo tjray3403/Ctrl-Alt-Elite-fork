@@ -1,12 +1,11 @@
+// ✅ add_class_screen.tsx
 import React, { useState } from 'react';
-import { 
-  View, TextInput, Button, Text, ScrollView, StyleSheet, TouchableOpacity, Platform 
-} from 'react-native';
+import { View, TextInput, Button, Text, ScrollView, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { db } from '@/config/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker'; //  Works for iOS & Android
+import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 
 const AddClassScreen: React.FC = () => {
@@ -20,16 +19,15 @@ const AddClassScreen: React.FC = () => {
   const [roomNumber, setRoomNumber] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [note, setNote] = useState('');
-  const [startTime, setStartTime] = useState(''); //  Stores selected time
+  const [startTime, setStartTime] = useState('');
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
-  //  Handles time selection across platforms
   const handleConfirmTime = (event: any, selectedTime?: Date) => {
     if (selectedTime) {
       setSelectedDate(selectedTime);
-      setStartTime(moment(selectedTime).format('hh:mm A')); //  Ensures standard "08:30 AM" format
+      setStartTime(moment(selectedTime).format('hh:mm A'));
     }
     setTimePickerVisible(false);
   };
@@ -49,16 +47,15 @@ const AddClassScreen: React.FC = () => {
       const userClassesRef = collection(db, `users/${user.uid}/classes`);
       await addDoc(userClassesRef, {
         name,
-        professor: professor || null, // Optional
+        professor: professor || null,
         building,
-        roomNumber: roomNumber || null, // Optional
-        imageUrl: imageUrl || null, // Optional
-        note: note || null, // Optional
-        startTime, //  Stores formatted start time
-        createdAt: serverTimestamp(), //  Uses Firestore server timestamp
+        roomNumber: roomNumber || null,
+        imageUrl: imageUrl || null,
+        note: note || null,
+        startTime,
+        createdAt: serverTimestamp(),
       });
 
-      // Clear inputs
       setName('');
       setProfessor('');
       setBuilding('');
@@ -70,7 +67,7 @@ const AddClassScreen: React.FC = () => {
       alert('✅ Class added successfully!');
 
       setTimeout(() => {
-        router.replace('/class/list_classes_screen'); //  Prevents navigation history stacking
+        router.replace('/class/list_classes_screen');
       }, 100);
     } catch (err) {
       console.error('❌ Error adding class:', err);
@@ -79,90 +76,91 @@ const AddClassScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.label}>Class Name *</Text>
-      <TextInput style={styles.input} value={name} onChangeText={setName} />
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => router.replace('/')}>
+        <Text style={styles.backButton}>← Home</Text>
+      </TouchableOpacity>
 
-      <Text style={styles.label}>Professor (Optional)</Text>
-      <TextInput style={styles.input} value={professor} onChangeText={setProfessor} />
+      <ScrollView>
+        <Text style={styles.label}>Class Name *</Text>
+        <TextInput style={styles.input} value={name} onChangeText={setName} />
 
-      <Text style={styles.label}>Building *</Text>
-      <TextInput style={styles.input} value={building} onChangeText={setBuilding} />
+        <Text style={styles.label}>Professor (Optional)</Text>
+        <TextInput style={styles.input} value={professor} onChangeText={setProfessor} />
 
-      <Text style={styles.label}>Room Number (Optional)</Text>
-      <TextInput style={styles.input} value={roomNumber} onChangeText={setRoomNumber} />
+        <Text style={styles.label}>Building *</Text>
+        <TextInput style={styles.input} value={building} onChangeText={setBuilding} />
 
-      {/*  Cross-platform Time Picker */}
-      <Text style={styles.label}>Start Time *</Text>
+        <Text style={styles.label}>Room Number (Optional)</Text>
+        <TextInput style={styles.input} value={roomNumber} onChangeText={setRoomNumber} />
 
-      {Platform.OS === 'web' ? (
-        //  Web: Use native HTML time input
-        <TextInput
-          style={styles.input}
-          value={startTime}
-          onChangeText={(text) => setStartTime(text)}
-          placeholder="Select Time"
-        />
-      ) : (
-        //  Mobile: Use native picker
-        <TouchableOpacity style={styles.timePicker} onPress={() => setTimePickerVisible(true)}>
-          <Text style={startTime ? styles.selectedTime : styles.placeholderText}>
-            {startTime || 'Select Time'}
-          </Text>
-        </TouchableOpacity>
-      )}
+        <Text style={styles.label}>Start Time *</Text>
+        {Platform.OS === 'web' ? (
+          <TextInput
+            style={styles.input}
+            value={startTime}
+            onChangeText={setStartTime}
+            placeholder="Select Time"
+          />
+        ) : (
+          <TouchableOpacity style={styles.timePicker} onPress={() => setTimePickerVisible(true)}>
+            <Text style={startTime ? styles.selectedTime : styles.placeholderText}>
+              {startTime || 'Select Time'}
+            </Text>
+          </TouchableOpacity>
+        )}
 
-      {Platform.OS !== 'web' && isTimePickerVisible && (
-       <View style={styles.pickerContainer}> 
-       <DateTimePicker
-          value={selectedDate || new Date()}
-          mode="time"
-          is24Hour={false}
-          display="spinner"
-          textColor="black"
-          onChange={handleConfirmTime}
-        />
-        </View>
-      )}
+        {Platform.OS !== 'web' && isTimePickerVisible && (
+          <View style={styles.pickerContainer}>
+            <DateTimePicker
+              value={selectedDate || new Date()}
+              mode="time"
+              is24Hour={false}
+              display="spinner"
+              onChange={handleConfirmTime}
+            />
+          </View>
+        )}
 
-      <Text style={styles.label}>Image URL (Optional)</Text>
-      <TextInput style={styles.input} value={imageUrl} onChangeText={setImageUrl} />
+        <Text style={styles.label}>Image URL (Optional)</Text>
+        <TextInput style={styles.input} value={imageUrl} onChangeText={setImageUrl} />
 
-      <Text style={styles.label}>Note (Optional)</Text>
-      <TextInput style={styles.input} value={note} onChangeText={setNote} />
+        <Text style={styles.label}>Note (Optional)</Text>
+        <TextInput style={styles.input} value={note} onChangeText={setNote} />
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+        {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Button title="Add Class" onPress={handleAddClass} color="#28a745" />
-    </ScrollView>
+        <Button title="Add Class" onPress={handleAddClass} color="#28a745" />
+      </ScrollView>
+    </View>
   );
 };
 
 export default AddClassScreen;
 
 const styles = StyleSheet.create({
-  container: { 
+  container: {
     flex: 1,
-    padding: 16, 
-    backgroundColor: '#fff' 
+    padding: 16,
+    backgroundColor: '#fff',
   },
-  label: { 
-    fontWeight: 'bold', 
-    marginTop: 12 
+  label: {
+    fontWeight: 'bold',
+    marginTop: 12,
   },
   pickerContainer: {
-    backgroundColor: '#fff', 
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  input: { 
-    borderWidth: 1, 
-    borderColor: '#ccc', 
-    borderRadius: 4, 
-    padding: 10, 
-    marginTop: 4 
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    padding: 10,
+    marginTop: 4,
   },
   timePicker: {
     borderWidth: 1,
@@ -179,8 +177,14 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: '#888',
   },
-  error: { 
-    color: 'red', 
-    marginVertical: 8 
+  error: {
+    color: 'red',
+    marginVertical: 8,
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#007bff',
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
 });
