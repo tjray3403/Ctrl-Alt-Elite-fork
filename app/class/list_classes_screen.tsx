@@ -53,13 +53,7 @@ const ListClassesScreen: React.FC = () => {
 
         setClasses(sortedClasses);
 
-        // Re-fetch classes when the page is refreshed
-        window.addEventListener('focus', fetchClasses);
-
-        // Cleanup event listener on component unmount
-        return () => {
-          window.removeEventListener('focus', fetchClasses);
-        };
+        
 
 
 
