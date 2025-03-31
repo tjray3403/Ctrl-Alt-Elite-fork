@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert, Image } from "react-native"; // Import Image from react-native
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Progress from 'react-native-progress';
 
@@ -61,6 +61,19 @@ const WaterTracking = () => {
     }
   };
 
+  // Handle subtracting water
+  const subtractWater = () => {
+    const parsedValue = parseFloat(inputValue);
+    if (!isNaN(parsedValue) && parsedValue > 0) {
+      const newTotal = Math.max(totalWater - parsedValue, 0); // Ensure totalWater doesn't go below 0
+      setTotalWater(newTotal);
+      saveWaterData(newTotal);
+      setInputValue("");
+    } else {
+      Alert.alert("Invalid Input", "Please enter a valid number greater than 0.");
+    }
+  };
+
   // Set a new daily goal
   const setGoal = () => {
     const parsedGoal = parseFloat(goalInput);
@@ -76,7 +89,35 @@ const WaterTracking = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Water Tracking</Text>
+      <Text style={styles.title}>Water Tracker</Text>
+
+      {/* Progress Bar */}
+      <View style={styles.progressContainer}>
+        <Text style={styles.totalText}>
+          Total Water Consumed Today: {totalWater.toFixed(2)} Ounces
+        </Text>
+        <View style={styles.progressWrapper}>
+          <Progress.Circle
+            progress={Math.min(totalWater / dailyGoal, 1)} // Ensure progress doesn't exceed 1
+            size={180} // Adjust the size of the circle
+            thickness={8} // Adjust the thickness of the circle
+            color="#3b9d9b"
+            borderWidth={0}
+            showsText={false} // Disable default text inside the circle
+          />
+          {/* Add the image in the center */}
+          <Image
+            source={require("../../assets/images/water.jpg")} // Replace with your image path
+            style={styles.progressImage}
+          />
+        </View>
+        <Text style={styles.goalText}>
+          {totalWater.toFixed(2)} / {dailyGoal} Ounces
+        </Text>
+        {totalWater >= dailyGoal && (
+          <Text style={styles.congratsText}>You met your water intake goal!🎉</Text>
+        )}
+      </View>
 
       {/* Set Daily Goal Section */}
       <Text style={styles.subtitle}>Set Your Daily Goal (Ounces)</Text>
@@ -86,6 +127,8 @@ const WaterTracking = () => {
         keyboardType="numeric"
         value={goalInput}
         onChangeText={setGoalInput}
+        returnKeyType="done" // Adds a "Done" button on iOS
+        onSubmitEditing={setGoal} // Calls the setGoal function when "Done" is pressed
       />
       <Button title="Set Goal" onPress={setGoal} />
 
@@ -97,25 +140,12 @@ const WaterTracking = () => {
         keyboardType="numeric"
         value={inputValue}
         onChangeText={setInputValue}
+        returnKeyType="done" // Adds a "Done" button on iOS
+        onSubmitEditing={addWater} // Calls the addWater function when "Done" is pressed
       />
       <Button title="Add Water" onPress={addWater} />
-
-      {/* Progress Bar */}
-      <View style={styles.progressContainer}>
-        <Text style={styles.totalText}>
-          Total Water Consumed Today: {totalWater.toFixed(2)} Ounces
-        </Text>
-        <Progress.Bar
-          progress={totalWater / dailyGoal}
-          width={300}
-          height={10}
-          color="#3b9d9b"
-          borderWidth={0}
-        />
-        <Text style={styles.goalText}>
-          {totalWater.toFixed(2)} / {dailyGoal} Ounces
-        </Text>
-      </View>
+      <Button title="Subtract Water" onPress={subtractWater} /> {/* New button */}
+      
     </View>
   );
 };
@@ -150,6 +180,17 @@ const styles = StyleSheet.create({
     width: "80%",
     alignItems: "center",
   },
+  progressWrapper: {
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  progressImage: {
+    position: "absolute", // Overlay the image in the center
+    width: 165, // Slightly smaller than the circle size (100 - 2 * thickness)
+    height: 165, // Match the width for a square image
+    borderRadius: 100, // Make the image circular (half of the width/height)
+  },
   totalText: {
     fontSize: 18,
     fontWeight: "600",
@@ -159,6 +200,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#3b9d9b",
+  },
+  congratsText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#3b9d9b",
+    marginTop: 10,
   },
 });
 

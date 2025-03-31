@@ -33,10 +33,11 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#6A0DAD",
+    fontSize: 40, // Increase the font size
+    fontWeight: "bold", // Make the text bold
+    color: "black", // Set the text color to black
+    textAlign: "center", // Center the text horizontally
+    marginBottom: 20, // Add spacing below the title
   },
   primaryButton: {
     marginTop: 20,
@@ -166,16 +167,27 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   input: {
-    flex: 1,
-    padding: 10,
-    fontSize: 18,
-    color: "#000",
-    marginLeft: 10,
-    outlineColor: "transparent",
-    outlineWidth: 0,
+    backgroundColor: "#c4cacb", // Dark gray background
+    color: "#000000", // White text color for better contrast
+    padding: 15, // Add padding inside the box
+    borderRadius: 8, // Rounded corners
+    fontSize: 16, // Adjust font size
+    marginVertical: 10, // Add spacing above and below the input
+    width: "90%", // Adjust width to fit nicely on the screen
+    alignSelf: "center", // Center the input horizontally
   },
   logoLogin: {
     width: 285,
     height: 116,
   },
-});
+  recommendation_button: {
+    width: "30%",
+    padding: 12,
+    backgroundColor: "#eeb8f9",
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: "#6A0DAD",
+  },
+  });

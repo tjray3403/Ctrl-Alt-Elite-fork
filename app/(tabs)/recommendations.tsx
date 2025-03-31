@@ -67,13 +67,14 @@ const RecommendationScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>How are you feeling?</Text>
       
       <TextInput
         value={mood}
         onChangeText={setMood}
         placeholder="I'm feeling..."
         placeholderTextColor="#888"
-        style={styles.input}
+        style={styles.input} // This style will be updated
       />
 
       <TouchableOpacity style={styles.recommendation_button} onPress={getSuggestion}>

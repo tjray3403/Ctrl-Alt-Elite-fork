@@ -76,10 +76,13 @@ export default function HomeScreen() {
       <Text style={styles.profileInfo}>Welcome to the Panther Pace App!</Text>
 
       <Link style={styles.link} href={"/(tabs)/weather"}>
-        <Text style={styles.linkText}>Weather</Text>
+        <Text style={styles.linkText}>Weather☁️</Text>
       </Link>
       <Link style={styles.link} href={"/Water_tracking/Water"}>
-        <Text style={styles.linkText}>Water Tracker</Text>
+        <Text style={styles.linkText}>Water Tracker💧</Text>
+      </Link>
+      <Link style={styles.link} href={"/Step_tracking/steps"}>
+        <Text style={styles.linkText}>Step Tracker👣</Text>
       </Link>
 
       {/*  Display the next class */}
