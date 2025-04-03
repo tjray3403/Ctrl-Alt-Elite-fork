@@ -1,8 +1,9 @@
 import { styles } from "../../config/styles";
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
 import axios from "axios";
-
+import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db } from "../../config/firebase"; // Ensure Firestore is initialized
 // 🔹 Typing Effect Component
 const TypingEffect: React.FC<{ text?: string }> = ({ text = "" }) => {
   const [displayedText, setDisplayedText] = useState("");
@@ -48,15 +49,39 @@ const RecommendationScreen: React.FC = () => {
   const [mood, setMood] = useState("");
   const [suggestion, setSuggestion] = useState("");
   const [loading, setLoading] = useState(false);
+  const [chats, setChats] = useState<{ mood: string; suggestion: string }[]>([]);
+
+  useEffect(() => {
+    const q = query(collection(db, "chats"), orderBy("timestamp", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedChats = snapshot.docs.map((doc) => doc.data() as { mood: string; suggestion: string });
+      setChats(fetchedChats);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const getSuggestion = async () => {
     setLoading(true);
     try {
       const response = await axios.post(
         "https://tjray3403-pantherrecommendation.hf.space/suggest",
-        { mood }
+        { mood},
       );
-      setSuggestion(response.data.suggested_activity);
+      const newSuggestion = response.data.suggested_activity + ". " + response.data.additional_note;
+      setSuggestion(newSuggestion);
+
+      if (!newSuggestion) {
+        throw new Error("No suggestion received from API.");
+      }
+    
+      // Save mood and suggestion to Firestore
+      await addDoc(collection(db, "chats"), {
+        mood,
+        suggestion: newSuggestion,
+        timestamp: new Date(),
+      });
+
+      console.log("API Response:", response.data);
     } catch (error) {
       console.error(error);
       setSuggestion("Error fetching suggestion.");
@@ -66,27 +91,43 @@ const RecommendationScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      
-      <TextInput
-        value={mood}
-        onChangeText={setMood}
-        placeholder="I'm feeling..."
-        placeholderTextColor="#888"
-        style={styles.input}
-      />
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <TextInput
+          value={mood}
+          onChangeText={setMood}
+          placeholder="I'm feeling..."
+          placeholderTextColor="#888"
+          style={styles.input}
+        />
 
-      <TouchableOpacity style={styles.recommendation_button} onPress={getSuggestion}>
-        <Text style={styles.buttonText}>Get Suggestion</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.recommendation_button} onPress={getSuggestion}>
+          <Text style={styles.buttonText}>Get Suggestion</Text>
+        </TouchableOpacity>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#8A56AC" />
-      ) : suggestion ? (
-        <View style={styles.recommendation_suggestionBox}>
-          <TypingEffect text={suggestion} />
+        {loading ? (
+          <ActivityIndicator size="large" color="#8A56AC" />
+        ) : null}
+
+        {/* Display current suggestion */}
+        {suggestion && !loading ? (
+          <View style={styles.recommendation_suggestionBox}>
+            <TypingEffect text={suggestion} />
+          </View>
+        ) : null}
+      </ScrollView>
+
+      {/* Scrollable chat section */}
+      <ScrollView style={{ flex: 1, marginTop: 10 }}>
+        <View style={styles.chatContainer}>
+          {chats.map((chat, index) => (
+            <View key={index} style={styles.chatItem}>
+              <Text style={styles.chatMood}>Mood: {chat.mood}</Text>
+              <Text style={styles.chatSuggestion}>Suggestion: {chat.suggestion}</Text>
+            </View>
+          ))}
         </View>
-      ) : null}
+      </ScrollView>
     </View>
   );
 };

@@ -214,5 +214,31 @@ export const styles = StyleSheet.create({
     color: "#5B2E8F",
     fontWeight: "500",
     textAlign: "center",
-  }
+  },
+  chatContainer: {
+    flex: 1,
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 8,
+  },
+  chatItem: {
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  chatMood: {
+    fontWeight: "bold",
+    color: "#333",
+  },
+  chatSuggestion: {
+    color: "#555",
+  },
+
 });
