@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, StatusBar } from 'react-native'
 import React from 'react'
 
 /**
@@ -21,7 +21,7 @@ type ValueProps = {
 {/**
  * A functional component that displays a label and its corresponding value.*/}
 const Value = ({label, value}: ValueProps) => (
-    <View  style={styles.valueContainer}> {/* hi*/}
+    <View style={styles.valueContainer}> {/* hi*/}
     <Text style={styles.label}>{label} </Text>
     <Text style={styles.value}>{value}</Text>
     </View>
@@ -32,18 +32,14 @@ const Value = ({label, value}: ValueProps) => (
 const steps = () => {
   return (
     <View style={styles.container}>
-        <View style={{flexDirection: 'row'}}> {/* This will allow the titles to be horizontal and the info displayed below it */}
+        <View style={styles.values}> {/* This will allow the titles to be horizontal and the info displayed below it */}
             <Value label = "Steps:" value="1219" />
             <Value label = "Distance:" value=".75 miles" />
+            <Value label = "Flights Climbed:" value="3" />
             
         </View>
-        {/* */}
 
-            <View style={styles.valueContainer}> 
-                <Text style={styles.label}>Flights Climbed: </Text>
-                <Text style={styles.value}>3</Text>
-            </View>
-       
+        <StatusBar barStyle="dark-content" /> {/* This will change the status bar to dark mode */}
     
     </View>
   )
@@ -61,21 +57,26 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: '#333',
     },
+    values: {
+        flexDirection: 'row', // Change to column to stack items vertically
+        gap: 25,
+        flexWrap: 'wrap', // Allow items to wrap to the next line if needed'
+        rowGap: 20, // Add gap between rows
+        columnGap: 1, // Add gap between columns
+    },
     label: { 
-        fontWeight: '700', //Changing thickness of the font
+        fontWeight: '700', // Changing thickness of the font
         fontSize: 35,
-
-
     },
     value: {
-        fontSize: 35,
+        fontSize: 45,
         color: '#333',
+    },
+    valueContainer: {
+        marginVertical: 10, // Add vertical margin between items
+        minWidth: '30%', // Ensure each item takes up at least half the width
 
 
     },
-    valueContainer: { 
-        marginRight: 50 // This allows me to space the steps, distance and flights climbed so they're not right on top of each other
-    },
-
-
-    })
+    
+});
