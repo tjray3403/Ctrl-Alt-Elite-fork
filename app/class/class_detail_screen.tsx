@@ -1,0 +1,141 @@
+// ✅ class_detail_screen.tsx
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
+import { db } from '@/config/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { getAuth } from 'firebase/auth';
+
+interface ClassData {
+  name: string;
+  imageUrl?: string;
+  professor?: string;
+  building?: string;
+  roomNumber?: string;
+  note?: string;
+}
+
+const ClassDetailScreen: React.FC = () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const { classId } = useLocalSearchParams();
+  const router = useRouter();
+  const [classData, setClassData] = useState<ClassData | null>(null);
+
+  useEffect(() => {
+    if (!user || !classId) return;
+
+    const fetchClass = async () => {
+      try {
+        const docRef = doc(db, `users/${user.uid}/classes/${classId}`);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setClassData(docSnap.data() as ClassData);
+        } else {
+          console.error('Class not found');
+        }
+      } catch (err) {
+        console.error('Error fetching class:', err);
+      }
+    };
+
+    fetchClass();
+  }, [user, classId]);
+
+  if (!classData) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading class details...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => router.replace('/')}>
+        <Text style={styles.backButton}>← Home</Text>
+      </TouchableOpacity>
+
+      <ScrollView style={styles.container}>
+        <Image
+          source={classData.imageUrl ? { uri: classData.imageUrl } : require('@/pantherpace_logo.jpg')}
+          style={styles.bannerImage}
+        />
+
+        <View style={styles.detailsContainer}>
+          <Text style={styles.classTitle}>{classData.name}</Text>
+          {classData.professor && <Text style={styles.classInfo}>Professor: {classData.professor}</Text>}
+          <Text style={styles.classInfo}>Building: {classData.building}</Text>
+          {classData.roomNumber && <Text style={styles.classInfo}>Room: {classData.roomNumber}</Text>}
+
+          {classData.note && (
+            <View style={styles.noteContainer}>
+              <Text style={styles.subtitle}>Note:</Text>
+              <Text style={styles.noteText}>{classData.note}</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
+
+export default ClassDetailScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+    ...Platform.select({
+      web: {
+        shadowColor: 'rgba(0, 0, 0, 0.2)',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 10,
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+      },
+    }),
+  },
+  bannerImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+  },
+  detailsContainer: {
+    alignItems: 'center',
+    padding: 16,
+  },
+  classTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  classInfo: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  noteContainer: {
+    marginTop: 12,
+  },
+  noteText: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#007bff',
+    fontWeight: 'bold',
+    margin: 16,
+  },
+});

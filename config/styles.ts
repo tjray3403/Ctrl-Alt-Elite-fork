@@ -33,11 +33,10 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   title: {
-    fontSize: 40, // Increase the font size
-    fontWeight: "bold", // Make the text bold
-    color: "black", // Set the text color to black
-    textAlign: "center", // Center the text horizontally
-    marginBottom: 20, // Add spacing below the title
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#6A0DAD",
   },
   primaryButton: {
     marginTop: 20,
@@ -167,27 +166,79 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   input: {
-    backgroundColor: "#c4cacb", // Dark gray background
-    color: "#000000", // White text color for better contrast
-    padding: 15, // Add padding inside the box
-    borderRadius: 8, // Rounded corners
-    fontSize: 16, // Adjust font size
-    marginVertical: 10, // Add spacing above and below the input
-    width: "90%", // Adjust width to fit nicely on the screen
-    alignSelf: "center", // Center the input horizontally
+    flex: 1,
+    padding: 10,
+    fontSize: 18,
+    color: "#000",
+    marginLeft: 10,
+    outlineColor: "transparent",
   },
+  
   logoLogin: {
     width: 285,
     height: 116,
   },
-  recommendation_button: {
-    width: "30%",
+
+  recommendation_input: {
+    width: "90%",
     padding: 12,
-    backgroundColor: "#eeb8f9",
     borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 10,
-    borderWidth: 2,
-    borderColor: "#6A0DAD",
+    backgroundColor: "#EAEAEA",
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 15,
   },
-  });
+  recommendation_button: {
+    backgroundColor: "#8A56AC",
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+
+  recommendation_buttonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  recommendation_suggestionBox: {
+    backgroundColor: "#E8D7F1",
+    padding: 15,
+    borderRadius: 15,
+    width: "90%",
+    marginTop: 15,
+    textAlign: "center",
+  },
+  recommendation_suggestionText: {
+    fontSize: 16,
+    color: "#5B2E8F",
+    fontWeight: "500",
+    textAlign: "center",
+  },
+  chatContainer: {
+    flex: 1,
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 8,
+  },
+  chatItem: {
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  chatMood: {
+    fontWeight: "bold",
+    color: "#333",
+  },
+  chatSuggestion: {
+    color: "#555",
+  },
+
+});
