@@ -93,7 +93,7 @@ const ListClassesScreen: React.FC = () => {
             <Image
               source={item.imageUrl 
                 ? { uri: item.imageUrl } 
-                : require('../../assets/images/logo-login.png')}
+                : require('../../assets/images/login-logo.png')}
               
               style={styles.cardImage}
             />

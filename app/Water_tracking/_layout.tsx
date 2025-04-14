@@ -1,6 +1,6 @@
 import React from "react";
 import { Stack } from "expo-router";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Platform, StatusBar } from "react-native";
 
 function CustomHeader() {
   return (
@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "black",
     padding: 10,
+    paddingTop: Platform.OS === "ios" ? StatusBar.currentHeight || 20 : 10, // Add padding for iOS
     alignItems: "center", // Center content horizontally
     justifyContent: "center", // Center content vertically
   },

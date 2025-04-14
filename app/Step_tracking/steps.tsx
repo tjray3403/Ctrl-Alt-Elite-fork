@@ -1,5 +1,8 @@
-import { View, Text, StyleSheet, StatusBar } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { StatusBar } from 'react-native'; // Importing StatusBar from react-native
+import Value from '@/components/Value'; // Importing the Value component to display step tracking information
+import RingProgress from '@/components/RingProgress';  
 
 /**
  * A functional React component that displays step tracking information.
@@ -12,26 +15,11 @@ import React from 'react'
  */
 
 
-{/*This is needed in typescript since it requires types so it needs to know what it should be taking in */}
-type ValueProps = {
-    label: string;
-    value: string;
-}
-
-{/**
- * A functional component that displays a label and its corresponding value.*/}
-const Value = ({label, value}: ValueProps) => (
-    <View style={styles.valueContainer}> {/* hi*/}
-    <Text style={styles.label}>{label} </Text>
-    <Text style={styles.value}>{value}</Text>
-    </View>
-
-
-);
-
 const steps = () => {
   return (
     <View style={styles.container}>
+        <RingProgress /> {/* This will display the ring progress */}
+
         <View style={styles.values}> {/* This will allow the titles to be horizontal and the info displayed below it */}
             <Value label = "Steps:" value="1219" />
             <Value label = "Distance:" value=".75 miles" />
@@ -59,24 +47,13 @@ const styles = StyleSheet.create({
     },
     values: {
         flexDirection: 'row', // Change to column to stack items vertically
-        gap: 25,
+        gap: 3,
         flexWrap: 'wrap', // Allow items to wrap to the next line if needed'
         rowGap: 20, // Add gap between rows
-        columnGap: 1, // Add gap between columns
+        columnGap:1, // Add gap between columns
     },
-    label: { 
-        fontWeight: '700', // Changing thickness of the font
-        fontSize: 35,
-    },
-    value: {
-        fontSize: 45,
-        color: '#333',
-    },
-    valueContainer: {
-        marginVertical: 10, // Add vertical margin between items
-        minWidth: '30%', // Ensure each item takes up at least half the width
 
-
-    },
     
 });
+
+
