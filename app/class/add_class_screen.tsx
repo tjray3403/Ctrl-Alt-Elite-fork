@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     color: '#007bff',
     fontWeight: 'bold',
     marginBottom: 10,
-  },
+  }, 
   uploadButton: {
     backgroundColor: '#007bff',
     padding: 10,

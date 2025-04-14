@@ -56,7 +56,7 @@ const EditClassScreen: React.FC = () => {
         console.error('Error fetching class:', err);
       } finally {
         setLoading(false);
-      }
+      } 
     };
 
     fetchClass();

@@ -118,7 +118,7 @@ const RecommendationScreen: React.FC = () => {
         </View>
       ))}
     </View>
-  </ScrollView>
+  </ScrollView> 
 
   {/* Toggle Button */}
   <TouchableOpacity
