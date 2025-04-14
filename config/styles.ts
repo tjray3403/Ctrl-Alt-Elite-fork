@@ -38,22 +38,26 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
     color: "#6A0DAD",
   },
+  input: {
+    width: "100%",
+    padding: 12,
+    borderWidth: 2,
+    borderColor: "#A67C00",
+    borderRadius: 10,
+    backgroundColor: "white",
+    marginBottom: 15,
+    fontSize: 16,
+    color: "#000",
+  },
   primaryButton: {
-    marginTop: 20,
-    width: 170,
-    paddingVertical: 15,
-    height: 60,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    backgroundColor: "#F1D4F9", //5D0170 darkest purple
-    borderRadius: 20,
+    width: "100%",
+    padding: 12,
+    backgroundColor: "#6A0DAD",
+    borderRadius: 10,
     alignItems: "center",
-    justifyContent: "center",
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: "#FFD700",
   },
   secondaryButton: {
     width: "100%",
@@ -74,12 +78,9 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "bold",
     color: "white",
-    textShadowColor: "#000",
-    textShadowOffset: { width: 0.5, height: 0.5 },
-    textShadowRadius: 1,
   },
   errorText: {
     color: "red",
@@ -197,6 +198,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#EAEAEA",
     fontSize: 16,
     textAlign: "center",
+    color: "#000",
     marginBottom: 15,
   },
   recommendation_button: {
@@ -206,7 +208,6 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
   },
-
   recommendation_buttonText: {
     color: "#FFF",
     fontWeight: "bold",
@@ -219,6 +220,7 @@ export const styles = StyleSheet.create({
     width: "90%",
     marginTop: 15,
     textAlign: "center",
+    alignItems: "center",
   },
   recommendation_suggestionText: {
     fontSize: 16,
