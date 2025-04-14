@@ -2,8 +2,8 @@ import { styles } from "../../config/styles";
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
 import axios from "axios";
-import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
-import { db } from "../../config/firebase"; // Ensure Firestore is initialized
+import { collection, addDoc, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { db , auth} from "../../config/firebase"; // Ensure Firestore is initialized
 // 🔹 Typing Effect Component
 const TypingEffect: React.FC<{ text?: string }> = ({ text = "" }) => {
   const [displayedText, setDisplayedText] = useState("");
@@ -32,6 +32,7 @@ const TypingEffect: React.FC<{ text?: string }> = ({ text = "" }) => {
 };
 
 
+
 const LoadingDots: React.FC = () => {
   const [dots, setDots] = useState(".");
 
@@ -55,7 +56,15 @@ const RecommendationScreen: React.FC = () => {
   const [isPanelVisible, setIsPanelVisible] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "chats"), orderBy("timestamp", "desc"));
+    const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+
+    const q = query(
+      collection(db, "chats"),
+      where("userId", "==", currentUser.uid), 
+      orderBy("timestamp", "desc")
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedChats = snapshot.docs.map((doc) => doc.data() as { mood: string; suggestion: string });
       setChats(fetchedChats);
@@ -81,6 +90,7 @@ const RecommendationScreen: React.FC = () => {
       await addDoc(collection(db, "chats"), {
         mood,
         suggestion: newSuggestion,
+        userId: auth.currentUser?.uid,
         timestamp: new Date(),
       });
 

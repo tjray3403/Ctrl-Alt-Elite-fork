@@ -91,9 +91,7 @@ const ListClassesScreen: React.FC = () => {
             onPress={() => handleClassSelect(item.id)}
           >
             <Image
-              source={item.imageUrl 
-                ? { uri: item.imageUrl } 
-                : require('../../assets/images/logo-login.png')}
+              //source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/images/logo-login.png')}
               
               style={styles.cardImage}
             />
