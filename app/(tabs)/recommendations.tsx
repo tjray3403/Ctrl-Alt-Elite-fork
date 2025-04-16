@@ -1,102 +1,109 @@
 import { styles } from "../../config/styles";
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
 import axios from "axios";
-import { collection, addDoc, query, where, orderBy, onSnapshot } from "firebase/firestore";
-import { db , auth} from "../../config/firebase"; // Ensure Firestore is initialized
-// 🔹 Typing Effect Component
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+} from "firebase/firestore";
+import { db, auth } from "../../config/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
+
+// 🔹 Typing Effect Component (unchanged)
 const TypingEffect: React.FC<{ text?: string }> = ({ text = "" }) => {
   const [displayedText, setDisplayedText] = useState("");
-
   useEffect(() => {
-    if (!text) return; 
-
-    setDisplayedText(""); 
-    let index = 0; 
-
-    const interval = setInterval(() => {
-      setDisplayedText((prev) => {
-        if (index < text.length) {
-          return prev + text.charAt(index++); 
-        } else {
-          clearInterval(interval);
-          return prev;
-        }
-      });
-    }, 50); 
-
-    return () => clearInterval(interval);
+    if (!text) return;
+    setDisplayedText("");
+    let i = 0;
+    const intv = setInterval(() => {
+      setDisplayedText((prev) =>
+        i < text.length ? prev + text.charAt(i++) : (clearInterval(intv), prev)
+      );
+    }, 50);
+    return () => clearInterval(intv);
   }, [text]);
-
   return <Text style={styles.profileInfo}>{displayedText}</Text>;
 };
 
-
-
-const LoadingDots: React.FC = () => {
-  const [dots, setDots] = useState(".");
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDots((prev) => (prev.length < 3 ? prev + "." : "."));
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
-
-  return <Text style={styles.profileInfo}>{dots}</Text>;
-};
-
 const RecommendationScreen: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
   const [mood, setMood] = useState("");
   const [suggestion, setSuggestion] = useState("");
-  const [save_suggestion, saveSuggestion] = useState("");
-
   const [loading, setLoading] = useState(false);
-  const [chats, setChats] = useState<{ mood: string; suggestion: string }[]>([]);
+  const [chats, setChats] = useState<{ mood: string; suggestion: string }[]>(
+    []
+  );
   const [isPanelVisible, setIsPanelVisible] = useState(true);
 
+  // 1) Watch auth state
   useEffect(() => {
-    const currentUser = auth.currentUser;
-  if (!currentUser) return;
-
-
-    const q = query(
-      collection(db, "chats"),
-      where("userId", "==", currentUser.uid), 
-      orderBy("timestamp", "desc")
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedChats = snapshot.docs.map((doc) => doc.data() as { mood: string; suggestion: string });
-      setChats(fetchedChats);
+    const unsubAuth = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      console.log("Auth state changed, user =", u?.uid || "null");
     });
-    return () => unsubscribe();
+    return () => unsubAuth();
   }, []);
 
+  // 2) Once we have a user, attach the Firestore listener
+  useEffect(() => {
+    if (!user) {
+      setChats([]);           // clear out old chats on sign‑out
+      return;
+    }
+    const chatsRef = collection(db, "users", user.uid, "chats");
+    const q = query(chatsRef, orderBy("timestamp", "desc"));
+    const unsubSnap = onSnapshot(q, (snap) => {
+      console.log("Got", snap.docs.length, "chat(s) for", user.uid);
+      setChats(
+        snap.docs.map((doc) => ({
+          ...(doc.data() as any),
+        }))
+      );
+    });
+    return () => unsubSnap();
+  }, [user]);
+
   const getSuggestion = async () => {
+    if (!mood.trim()) {
+      setSuggestion("Please enter how you're feeling.");
+      return;
+    }
+    if (!user) {
+      setSuggestion("You must be signed in to get a suggestion.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await axios.post(
+      const res = await axios.post(
         "https://tjray3403-pantherrecommendation.hf.space/suggest",
-        { mood},
+        { mood }
       );
-      const newSuggestion = response.data.suggested_activity + ". " + response.data.additional_note;
-      setSuggestion(newSuggestion);
+      console.log("API response:", res.data);
+      const newSug = `${res.data.suggested_activity}. ${res.data.additional_note}`;
+      setSuggestion(newSug);
 
-      if (!newSuggestion) {
-        throw new Error("No suggestion received from API.");
-      }
-    
-      // Save mood and suggestion to Firestore
-      await addDoc(collection(db, "chats"), {
+      // Save under users/{uid}/chats
+      await addDoc(collection(db, "users", user.uid, "chats"), {
         mood,
-        suggestion: newSuggestion,
-        userId: auth.currentUser?.uid,
-        timestamp: new Date(),
+        suggestion: newSug,
+        timestamp: serverTimestamp(),
       });
-
-      console.log("API Response:", response.data);
-    } catch (error) {
-      console.error(error);
+      console.log("Saved chat for", user.uid);
+    } catch (err: any) {
+      console.error(err);
       setSuggestion("Error fetching suggestion.");
     } finally {
       setLoading(false);
@@ -171,4 +178,3 @@ const RecommendationScreen: React.FC = () => {
 };
 
 export default RecommendationScreen;
-
