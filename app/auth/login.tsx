@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { Link, useRouter } from "expo-router";
 import { auth } from "../../config/firebase";
 import { styles } from "../../config/styles";
@@ -42,7 +42,7 @@ export default function Login() {
       ) : null}
       <View style={{ marginBottom: 20 }}>
         <Image
-          source={require("../../assets/images/logo-login.png")}
+          source={require("../../assets/images/panther-pace-logo-clear.png")} 
           width={285}
           height={116}
           style={styles.logoLogin}

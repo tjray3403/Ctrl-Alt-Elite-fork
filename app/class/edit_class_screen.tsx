@@ -7,6 +7,10 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import {LocationName} from '../../config/building_names'
+import { Picker } from '@react-native-picker/picker';
+import ImagePickerInput from '@/components/imagePickerInput';
+import DropDownList from '@/components/DropdownList';
 
 interface ClassData {
   name: string;
@@ -26,8 +30,11 @@ const EditClassScreen: React.FC = () => {
 
   const [classData, setClassData] = useState<ClassData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedbuilding, setSelectedBuilding] = useState<string | null>(null);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const buildingOptions = Object.values(LocationName);
+
 
   useEffect(() => {
     if (!user || !classId) return;
@@ -49,7 +56,7 @@ const EditClassScreen: React.FC = () => {
         console.error('Error fetching class:', err);
       } finally {
         setLoading(false);
-      }
+      } 
     };
 
     fetchClass();
@@ -151,12 +158,27 @@ const EditClassScreen: React.FC = () => {
           onChangeText={(text) => setClassData({ ...classData, professor: text })}
         />
 
-        <Text style={styles.label}>Building</Text>
-        <TextInput
-          style={styles.input}
-          value={classData.building}
-          onChangeText={(text) => setClassData({ ...classData, building: text })}
-        />
+      <Text style={styles.label}>Building</Text>
+      <View style={{ flex: 1, padding: 16 , zIndex:3}}>
+      <Text style={{ marginBottom: 8 }}>Choose a building:</Text>
+
+      <View style={{zIndex:4}}>
+      <DropDownList
+      
+          enumList={buildingOptions}
+          onSelect={(value) => {
+            setSelectedBuilding(value);
+            setClassData({ ...classData, building: value });
+          } }
+          placeholder="Select a building" selectedValue={''}
+                    />
+          
+</View>
+      <Text style={styles.selectedValue}>
+        Selected Building: {selectedbuilding}
+      </Text>
+    </View>
+
 
         <Text style={styles.label}>Room Number (Optional)</Text>
         <TextInput
@@ -165,19 +187,22 @@ const EditClassScreen: React.FC = () => {
           onChangeText={(text) => setClassData({ ...classData, roomNumber: text })}
         />
 
-        <Text style={styles.label}>Start Time *</Text>
-        {Platform.OS === 'web' ? (
-          <TextInput
-            style={styles.input}
-            value={classData.startTime}
-            onChangeText={(text) => setClassData({ ...classData, startTime: text })}
-            placeholder="Select Time"
-          />
-        ) : (
-          <TouchableOpacity style={styles.input} onPress={() => setTimePickerVisible(true)}>
-            <Text>{classData.startTime || 'Select Time'}</Text>
-          </TouchableOpacity>
-        )}
+      {/*  Start Time */}
+      <Text style={styles.label}>Start Time * </Text>
+      {Platform.OS === 'web' ? (
+        //  Web: Use native HTML time input
+        <TextInput
+          style={styles.input}
+          value={classData.startTime}
+          onChangeText={(text) => setClassData({ ...classData, startTime: text })}
+          placeholder="Select Time *(e.g. 5:00 AM, 5:30 PM)"
+        />
+      ) : (
+        //  Mobile: Use native picker
+        <TouchableOpacity style={styles.input} onPress={() => setTimePickerVisible(true)}>
+          <Text>{classData.startTime || 'Select Time'}</Text>
+        </TouchableOpacity>
+      )}
 
         {Platform.OS !== 'web' && isTimePickerVisible && (
           <View style={styles.pickerContainer}>
@@ -191,12 +216,22 @@ const EditClassScreen: React.FC = () => {
           </View>
         )}
 
-        <Text style={styles.label}>Image URL (Optional)</Text>
-        <TextInput
-          style={styles.input}
-          value={classData.imageUrl || ''}
-          onChangeText={(text) => setClassData({ ...classData, imageUrl: text })}
-        />
+      <Text style={styles.label}>Image URL (Optional)</Text>
+      <Text style={styles.label}>Image (Optional)</Text>
+<TextInput
+  style={styles.input}
+  value={classData.imageUrl || ''}
+  onChangeText={(text) => setClassData({ ...classData, imageUrl: text })}
+  placeholder="Paste image URL or upload below"
+/>
+<ImagePickerInput
+  label="Upload Image"
+  imageUrl={classData.imageUrl || ''}
+  onChange={(uri) => setClassData({ ...classData, imageUrl: uri })}
+/>
+
+
+      
 
         <Text style={styles.label}>Note (Optional)</Text>
         <TextInput
@@ -220,12 +255,18 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
+  
   pickerContainer: {
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  selectedValue: {
+    marginTop: 16,
+    fontSize: 14,
+    color: '#333',
   },
   loadingContainer: {
     flex: 1,
@@ -247,6 +288,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'red',
     textAlign: 'center',
+  },
+  uploadButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  uploadButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  imagePreview: {
+    width: '100%',
+    height: 180,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   backButton: {
     fontSize: 16,

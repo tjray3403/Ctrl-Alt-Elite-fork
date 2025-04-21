@@ -75,8 +75,14 @@ export default function HomeScreen() {
       <Text style={styles.title}>🏡 Home</Text>
       <Text style={styles.profileInfo}>Welcome to the Panther Pace App!</Text>
 
-      <Link style={styles.link} href={"/(tabs)/weather"}>
-        <Text style={styles.linkText}>Weather</Text>
+      <Link style={styles.link} href={"/other/weather"}>
+        <Text style={styles.linkText}>Weather☁️</Text>
+      </Link>
+      <Link style={styles.link} href={"/Water_tracking/Water"}>
+        <Text style={styles.linkText}>Water Tracker💧</Text>
+      </Link>
+      <Link style={styles.link} href={"/Step_tracking/steps"}>
+        <Text style={styles.linkText}>Step Tracker👣</Text>
       </Link>
 
       {/*  Display the next class */}
@@ -86,7 +92,7 @@ export default function HomeScreen() {
           onPress={() => router.push(`/class/list_classes_screen`)}
         >
           <Image 
-            source={nextClass.imageUrl ? { uri: nextClass.imageUrl } : require('@/pantherpace_logo.jpg')} 
+            //source={nextClass.imageUrl ? { uri: nextClass.imageUrl } : /*require('../../assets/images/panther-pace-logo-clear.png')*/} 
             style={styles.classImage} 
           />
           <View style={styles.classInfoContainer}>

@@ -53,7 +53,7 @@ export default function Signup() {
 
       <View style={{ marginBottom: 20 }}>
         <Image
-          source={require("../../assets/images/logo-login.png")}
+          source={require("../../assets/images/panther-pace-logo-clear.png")}
           width={285}
           height={116}
           style={styles.logoLogin}

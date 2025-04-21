@@ -59,7 +59,7 @@ const ClassDetailScreen: React.FC = () => {
 
       <ScrollView style={styles.container}>
         <Image
-          source={classData.imageUrl ? { uri: classData.imageUrl } : require('@/pantherpace_logo.jpg')}
+          //source={classData.imageUrl ? { uri: classData.imageUrl } : require('../../assets/images/pantherpace_logo.png')}
           style={styles.bannerImage}
         />
 
