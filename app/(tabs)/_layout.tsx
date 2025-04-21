@@ -21,7 +21,7 @@ export default function TabLayout() {
           fontWeight: "bold",
         },
         tabBarIconStyle: {
-          color: "#FFD700", // Gold for active tab
+          color: "#FFD700",
           fontSize: 28,
         },
         tabBarLabelStyle: {
@@ -70,10 +70,12 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      {/* Optional hidden tab (if you ever need it) */}
       <Tabs.Screen
         name="weather"
         options={{
-          href: null,
+          href: null, // ❌ not shown in tab bar
           title: "Weather",
           tabBarIcon: ({ color }) => (
             <Ionicons name="sunny" size={28} color={color} />

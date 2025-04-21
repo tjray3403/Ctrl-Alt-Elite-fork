@@ -178,4 +178,15 @@ export const styles = StyleSheet.create({
     width: 285,
     height: 116,
   },
+  linkButton: {
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  
+  linkText: {
+    fontSize: 16,
+    color: "#007AFF", // standard iOS-style link
+    fontWeight: "500",
+  },
+  
 });
