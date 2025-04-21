@@ -1,5 +1,7 @@
 import { styles } from "../../config/styles";
 import React, { useState, useEffect } from "react";
+import { KeyboardAvoidingView, Platform } from "react-native";
+
 import {
   View,
   Text,
@@ -16,6 +18,9 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp,
+  DocumentReference, 
+  getDocs, 
+  deleteDoc,
 } from "firebase/firestore";
 import { db, auth } from "../../config/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
@@ -31,7 +36,7 @@ const TypingEffect: React.FC<{ text?: string }> = ({ text = "" }) => {
       setDisplayedText((prev) =>
         i < text.length ? prev + text.charAt(i++) : (clearInterval(intv), prev)
       );
-    }, 50);
+    }, 30);
     return () => clearInterval(intv);
   }, [text]);
   return <Text style={styles.profileInfo}>{displayedText}</Text>;
@@ -110,7 +115,23 @@ const RecommendationScreen: React.FC = () => {
     }
   };
 
+
+  const deleteDocByRef = async (docRef: DocumentReference) => {
+    try {
+      await deleteDoc(docRef); // ✅ Use deleteDoc() here
+      console.log("Deleted doc:", docRef.id);
+    } catch (err) {
+      console.error("Error deleting chat:", err);
+    }
+  };
+
   return (
+
+<KeyboardAvoidingView
+  behavior={Platform.OS === "ios" ? "padding" : undefined}
+  style={{ flex: 1 }}
+>
+
     <View style={{ flex: 1 }}>
   {/* Scrollable Chat Section */}
   <ScrollView
@@ -127,30 +148,71 @@ const RecommendationScreen: React.FC = () => {
     </View>
   </ScrollView> 
 
-  {/* Toggle Button */}
-  <TouchableOpacity
-    onPress={() => setIsPanelVisible(!isPanelVisible)}
-    style={{
-      position: "absolute",
-      bottom: isPanelVisible ? 200 : 0,
-      left: 20, // ← change to left side like your image
-      zIndex: 10,
-      padding: 8,
-      backgroundColor: "#fff",
-      borderRadius: 20,
-      elevation: 3,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.2,
-      shadowRadius: 3,
-    }}
-  >
-    <Text style={{ fontSize: 18 }}>{isPanelVisible ? "\\/" : "/\\"}</Text>
-  </TouchableOpacity>
-
+  
   {/* Sticky Input/Suggestion Panel */}
   {isPanelVisible && (
-    <View style={styles.bottomStickyPanel}>
+  <View style={[styles.bottomStickyPanel, { position: "relative" }]}>
+    {/* Floating buttons inside the panel */}
+    <View
+      style={{
+        position: "absolute",
+        top: 10,
+        left: 20,
+        right: 20,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        zIndex: 10,
+      }}
+    >
+      {/* Clear History */}
+      <TouchableOpacity
+        onPress={async () => {
+          if (user) {
+            if (
+              window.confirm(
+                "Are you sure you want to delete all chat history? Warning: This action cannot be undone."
+              )
+            ) {
+              try {
+                const chatsRef = collection(db, "users", user.uid, "chats");
+                const snapshot = await getDocs(chatsRef);
+                snapshot.docs.forEach((doc) => deleteDocByRef(doc.ref));
+                setChats([]);
+                console.log("All chats deleted for", user.uid);
+              } catch (err) {
+                console.error("Failed to delete chats:", err);
+              }
+            }
+          } else {
+            alert("You must be signed in to delete chat history.");
+          }
+        }}
+        style={{
+          backgroundColor: "#ff4d4d",
+          paddingVertical: 6,
+          paddingHorizontal: 12,
+          borderRadius: 16,
+        }}
+      >
+        <Text style={{ color: "#fff", fontWeight: "bold" }}>Clear History</Text>
+      </TouchableOpacity>
+
+      {/* Toggle Panel */}
+      <TouchableOpacity
+        onPress={() => setIsPanelVisible(false)}
+        style={{
+          backgroundColor: "#eee",
+          paddingVertical: 6,
+          paddingHorizontal: 12,
+          borderRadius: 16,
+        }}
+      >
+        <Text style={{ fontSize: 18 }}>\/</Text>
+      </TouchableOpacity>
+    </View>
+
+    {/* Scrollable content below floating buttons */}
+    <View style={{ paddingTop: 60 }}>
       <TextInput
       value={mood}
       onChangeText={setMood}
@@ -163,6 +225,11 @@ const RecommendationScreen: React.FC = () => {
       <Text style={styles.buttonText}>Get Suggestion</Text>
       </TouchableOpacity>
 
+      </View>
+<ScrollView
+      style={{ marginTop: 10 }} // leave space for buttons
+      keyboardShouldPersistTaps="handled"
+    >
       {loading ? (
       <ActivityIndicator size="large" color="#8A56AC" />
       ) : suggestion && !loading ? (
@@ -170,9 +237,37 @@ const RecommendationScreen: React.FC = () => {
         <TypingEffect text={suggestion} />
       </View>
       ) : null}
-    </View>
-  )}
+    </ScrollView>
+  </View>
+)}
+
+{!isPanelVisible && (
+  <TouchableOpacity
+    onPress={() => setIsPanelVisible(true)}
+    style={{
+      position: "absolute",
+      bottom: 60, // adjust as needed above nav bar
+      right: 20, // move to the bottom-right corner
+      zIndex: 10,
+      backgroundColor: "#fff",
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+      elevation: 3,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+    }}
+  >
+    <Text style={{ fontSize: 18 }}>/\</Text>
+  </TouchableOpacity>
+)}
+
 </View>
+</KeyboardAvoidingView>
+
+
 
   );
 };

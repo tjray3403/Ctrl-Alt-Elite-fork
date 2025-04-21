@@ -166,8 +166,8 @@ export const styles = StyleSheet.create({
     borderBottomColor: "#A6A6A6",
     borderBottomWidth: 1,
   },
-  input: {
-    width: "90%",
+  /*input: {
+  width: "90%",
   paddingVertical: 12,
   paddingHorizontal: 16,
   borderRadius: 12,
@@ -184,7 +184,7 @@ export const styles = StyleSheet.create({
   shadowOpacity: 0.05,
   shadowRadius: 3,
   elevation: 1,
-  },
+  },*/
   
   logoLogin: {
     width: 285,
