@@ -107,7 +107,7 @@ const WaterTracking = () => {
           />
           {/* Add the image in the center */}
           <Image
-            source={require("../../assets/images/water.jpg")} // Replace with your image path
+            source={require("../../assets/images/panther_water.png")} // Replace with your image path
             style={styles.progressImage}
           />
         </View>
