@@ -1,21 +1,48 @@
-import { View, Text, ScrollView, Dimensions } from "react-native";
+import { View, Text, ScrollView, FlatList, StyleSheet, Platform } from "react-native";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Platform } from "react-native";
+import { styles } from "../../config/styles";
+import TextWeather from "@/components/TextWeather";
+import { Dimensions, SafeAreaView } from "react-native";
 
-const openWeatherKey = "08111bff9b3841ae3ce10ba8c373abbb"; 
-const LAT = "30.0933"; 
-const LON = "-95.9877"; 
+const screenWidth = Dimensions.get("window").width;
+const openWeatherKey = "08111bff9b3841ae3ce10ba8c373abbb"; // API Key
+const LAT = "30.0933"; // Correct Latitude for Prairie View, TX
+const LON = "-95.9877"; // Correct Longitude for Prairie View, TX
+
+console.log(Platform.OS);
 
 const Weather = () => {
-  const [forecast, setForecast] = useState(null);
-  const [sky, setSky] = useState(null);
-  const [wind, setWind] = useState(null);
-  const [humidity, setHumidity] = useState(null);
-  const [sunrise, setSunrise] = useState(null);
-  const [sunset, setSunset] = useState(null);
-  const [hourlyForecast, setHourlyForecast] = useState([]);
-  const { width, height } = Dimensions.get("window"); // Get screen dimensions
+  interface Forecast {
+    temp: number;
+    feels_like: number;
+    sea_level: number;
+    temp_max: number;
+    temp_min: number;
+    pressure: number;
+    grnd_level: number;
+    humidity: number;
+  }
 
+  const [forecast, setForecast] = useState<Forecast | null>(null);
+  const [sky, setSky] = useState<string | null>(null);
+  const [wind, setWind] = useState<number | null>(null);
+  const [humidity, setHumidity] = useState<number | null>(null);
+  const [sunrise, setSunrise] = useState<number | null>(null);
+  const [sunset, setSunset] = useState<number | null>(null);
+
+  // New state for the 5-day forecast and hourly forecast
+  const [fiveDayForecast, setFiveDayForecast] = useState<any[]>([]);
+  const [hourlyForecast, setHourlyForecast] = useState<any[]>([]);
+
+  const { temp } = forecast || {};
+
+  const formatTime = (timestamp: number | null) => {
+    if (!timestamp) return "--";
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Function to load current weather data
   const loadForecast = async () => {
     try {
       const response = await fetch(
@@ -33,93 +60,163 @@ const Weather = () => {
     }
   };
 
-  const loadHourlyForecast = async () => {
+  // Function to load 5-day forecast (every 3 hours)
+  const fiveDayThreeHourForecast = async () => {
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/forecast?q=prairieView&appid=${openWeatherKey}&units=imperial`
       );
       const data = await response.json();
-      setHourlyForecast(data.list);
+
+      // Process the 5-day forecast
+      const dailyForecast = [];
+      let currentDate = null;
+      let dailyHigh = -Infinity;
+      let dailyLow = Infinity;
+
+      // Process hourly forecast
+      const hourlyForecast = [];
+
+      data.list.forEach((item) => {
+        const date = new Date(item.dt * 1000); // Convert to JavaScript Date object
+        const day = date.getDate();
+
+        // Process hourly forecast for the current day
+        if (date.getDate() === new Date().getDate()) {
+          hourlyForecast.push({
+            time: formatTime(item.dt),
+            temp: item.main.temp,
+          });
+        }
+
+        // Check if we are still on the same day or a new day
+        if (currentDate !== day) {
+          // If it's a new day, save the last day's forecast and reset
+          if (currentDate !== null) {
+            dailyForecast.push({
+              date: new Date(item.dt * 1000).toDateString(),
+              high: dailyHigh,
+              low: dailyLow,
+            });
+          }
+
+          // Reset for the new day
+          currentDate = day;
+          dailyHigh = -Infinity;
+          dailyLow = Infinity;
+        }
+
+        // Update high and low temperatures for the current day
+        if (item.main.temp_max > dailyHigh) dailyHigh = item.main.temp_max;
+        if (item.main.temp_min < dailyLow) dailyLow = item.main.temp_min;
+      });
+
+      // Add the last day's forecast
+      dailyForecast.push({
+        date: new Date(data.list[data.list.length - 1].dt * 1000).toDateString(),
+        high: dailyHigh,
+        low: dailyLow,
+      });
+
+      setFiveDayForecast(dailyForecast);  // Store the 5-day forecast in state
+      setHourlyForecast(hourlyForecast);  // Store hourly forecast in state
     } catch (error) {
-      console.error("Error fetching hourly forecast:", error);
+      console.error("Error fetching weather data:", error);
     }
   };
 
   useEffect(() => {
     loadForecast();
-    loadHourlyForecast();
+    fiveDayThreeHourForecast();  // Fetch the 5-day forecast
   }, []);
 
-  const formatTime = (timestamp) => {
-    if (!timestamp) return "--";
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
   return (
-    <ScrollView style={{ flex: 1 }}>
-      <View style={[styles.weatherScreen, { width }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#89CFF0" }}>
+      <ScrollView contentContainerStyle={{ padding: 20 }}>
         {/* Location & Date */}
-        <View style={styles.headerSection}>
-          <Text style={styles.cityText}>Prairie View, TX</Text>
-          <Text style={styles.dateText}>{new Date().toDateString()}</Text>
+        <View style={weatherstyles.headerSection}>
+          <Text style={weatherstyles.cityText}>Prairie View, TX</Text>
+          <Text style={weatherstyles.dateText}>{new Date().toDateString()}</Text>
         </View>
-
+  
         {/* Weather Icon + Temp + Condition */}
-        <View style={styles.mainCard}>
-          <Text style={styles.weatherIcon}>🌤️</Text>
-          <Text style={styles.temperatureText}>
-            {forecast?.temp?.toFixed(0) ?? 0}° F
+        <View style={weatherstyles.mainCard}>
+          <Text style={weatherstyles.weatherIcon}>🌤️</Text>
+          <Text style={weatherstyles.temperatureText}>
+            {temp?.toFixed(0) ?? 0}° F
           </Text>
-          <Text style={styles.skyText}>{sky}</Text>
+          <Text style={weatherstyles.skyText}>
+            Feels like {forecast?.feels_like?.toFixed(0) ?? "--"}°F
+          </Text>
+          <Text style={weatherstyles.skyText}>{sky}</Text>
         </View>
+  
+        
+        
+  
+        {/* Hourly Forecast (Horizontal) */}
+        <Text style={weatherstyles.subHeading}>Hourly Forecast</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {hourlyForecast.length > 0 ? (
+            hourlyForecast.map((hour, index) => (
+              <View key={index} style={[weatherstyles.hourCard, { width: screenWidth * 0.2 }]}>
+                <Text style={weatherstyles.hourTime}>{hour.time}</Text>
+                <Text style={weatherstyles.hourTemp}>{hour.temp.toFixed(0)}°F</Text>
+              </View>
+            ))
+          ) : (
+            <Text style={{ color: "#fff" }}>Loading hourly forecast...</Text>
+          )}
+        </ScrollView>
+  
+        {/* 5-Day Forecast (Vertical List) */}
+        <Text style={weatherstyles.subHeading}>5-Day Forecast</Text>
+        <FlatList
+          data={fiveDayForecast}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={weatherstyles.forecastCard}>
+              <Text style={weatherstyles.forecastDate}>{item.date}</Text>
+              <Text style={weatherstyles.forecastHighLow}>
+                High: {item.high}°F | Low: {item.low}°F
+              </Text>
+            </View>
+          )}
+
+          
+          scrollEnabled={false} // Let parent ScrollView handle scrolling
+        />
 
         {/* Stat Row: Humidity + Wind */}
-        <View style={styles.statRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Humidity</Text>
-            <Text style={styles.statValue}>{humidity ?? 0}%</Text>
+        <View style={weatherstyles.statRow}>
+          <View style={weatherstyles.statItem}>
+            <Text style={weatherstyles.statLabel}>Humidity</Text>
+            <Text style={weatherstyles.statValue}>{humidity ?? 0}%</Text>
           </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Wind</Text>
-            <Text style={styles.statValue}>{wind ?? 0} mph</Text>
+          <View style={weatherstyles.statItem}>
+            <Text style={weatherstyles.statLabel}>Wind</Text>
+            <Text style={weatherstyles.statValue}>{wind ?? 0} mph</Text>
           </View>
         </View>
 
         {/* Sunrise & Sunset */}
-        <View style={styles.statRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Sunrise</Text>
-            <Text style={styles.statValue}>{formatTime(sunrise)}</Text>
+        <View style={weatherstyles.statRow}>
+          <View style={weatherstyles.statItem}>
+            <Text style={weatherstyles.statLabel}>Sunrise</Text>
+            <Text style={weatherstyles.statValue}>{formatTime(sunrise)}</Text>
           </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Sunset</Text>
-            <Text style={styles.statValue}>{formatTime(sunset)}</Text>
+          <View style={weatherstyles.statItem}>
+            <Text style={weatherstyles.statLabel}>Sunset</Text>
+            <Text style={weatherstyles.statValue}>{formatTime(sunset)}</Text>
           </View>
         </View>
 
-        {/* 5 Day Forecast */}
-        <View style={styles.forecastContainer}>
-          {hourlyForecast.slice(0, 5).map((hour, index) => {
-            const date = new Date(hour.dt * 1000);
-            return (
-              <View key={index} style={styles.forecastItem}>
-                <Text style={styles.forecastDay}>{date.toLocaleDateString()}</Text>
-                <Text style={styles.forecastTemp}>
-                  {hour.main.temp_max.toFixed(0)}° / {hour.main.temp_min.toFixed(0)}°
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
-export default Weather;
-
-const styles = StyleSheet.create({
+const weatherstyles = StyleSheet.create({
   weatherScreen: {
     flex: 1,
     backgroundColor: "#89CFF0",
@@ -179,26 +276,54 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#fff",
   },
-  forecastContainer: {
-    marginTop: 30,
-  },
-  forecastItem: {
+
+  // 5-Day Forecast Styles
+  forecastCard: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     borderRadius: 15,
     padding: 15,
     marginBottom: 10,
     alignItems: "center",
   },
-  forecastDay: {
+  forecastDate: {
     fontSize: 16,
+    fontWeight: "bold",
     color: "#fff",
   },
-  forecastTemp: {
-    fontSize: 18,
-    fontWeight: "600",
+  forecastHighLow: {
+    fontSize: 14,
+    color: "#f0f0f0",
+  },
+
+  // Hourly Forecast Styles
+  hourCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 15,
+    padding: 10,
+    marginRight: 15,
+    alignItems: "center",
+    width: 70,
+  },
+  hourTime: {
+    fontSize: 12,
     color: "#fff",
+  },
+  hourTemp: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+
+  // Subheading styles
+  subHeading: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 10,
   },
 });
+
+export default Weather;
 /*
 const Weather = () => {
   //declares weather component and sets up state variables for forecast, clouds, wind, and sky
