@@ -109,9 +109,11 @@ export default function HomeScreen() {
       contentContainerStyle={{
         flexGrow: 1,
         justifyContent: "flex-start",
-        paddingBottom: 20, // Add padding to prevent overlap at the bottom
+        alignItems: "center",
+        gap: 20,
+        paddingBottom: 20,
       }}
-      style={[styles.container, { flex: 1 }]} // Adjusted for React Native compatibility
+      style={[styles.container, { flex: 1 }]}
     >
       <Image
         source={require("../../assets/images/panther-pace-logo-clear.png")}
@@ -176,66 +178,80 @@ export default function HomeScreen() {
       {/*<TouchableOpacity style={styles.primaryButton}>
         <Text style={styles.buttonText}>Start Workout</Text>
       </TouchableOpacity> */}
+
       <View
         style={[
-          styles.buttonsContainer,
           {
+            display: "flex",
             flexDirection: "row",
-            flexWrap: "wrap",
-            justifyContent: "space-around",
+            justifyContent: "space-evenly",
+            width: "90%",
+            padding: 15,
+            borderRadius: 12,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 3 },
+            shadowOpacity: 0.2,
+            shadowRadius: 5,
+            elevation: 5,
+            alignSelf: "center",
+            borderColor: "#DEDEDE",
+            borderWidth: 1,
           },
         ]}
       >
-        <View style={styles.weatherContainer}>
-          <Text style={styles.containerButtonText}>Weather</Text>
-          <Link style={styles.weatherTile} href={"/(tabs)/weather"}>
+        <View style={{ gap: 20 }}>
+          <View>
+            <Text style={styles.containerButtonText}>Weather</Text>
+            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
             <Image
-              source={require("../../assets/images/weatherButtonIcon.png")}
-              style={[
-                styles.icon,
-                { width: "100%", height: "100%", borderRadius: 30 },
-              ]} // Adjusted size to fill the circle
-            />
-          </Link>
+                source={require("../../assets/images/sunny-day.png")}
+                style={[
+                  styles.icon,
+                  { width: "100%", height: "100%", borderRadius: 999 },
+                ]} // Adjusted size to fill the circle
+              />
+            </Link>
+          </View>
+          <View>
+            <Text style={styles.containerButtonText}>Water</Text>
+            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+              <Image
+                source={require("../../assets/images/drinking-water.png")}
+                style={[
+                  styles.icon,
+                  { width: "100%", height: "100%", borderRadius: 999 },
+                ]} // Adjusted size to fill the circle
+              />
+            </Link>
+          </View>{" "}
         </View>
 
-        <View style={styles.waterContainer}>
-          <Text style={styles.containerButtonText}>Water</Text>
-          <Link style={styles.waterTile} href={"/(tabs)/weather"}>
-            <Image
-              source={require("../../assets/images/weatherButtonIcon.png")}
-              style={[
-                styles.icon,
-                { width: "100%", height: "100%", borderRadius: 30 },
-              ]} // Adjusted size to fill the circle
-            />
-          </Link>
-        </View>
+        <View style={{ gap: 20 }}>
+          <View>
+            <Text style={styles.containerButtonText}>Steps</Text>
+            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+              <Image
+                source={require("../../assets/images/running-fast.png")}
+                style={[
+                  styles.icon,
+                  { width: "100%", height: "100%", borderRadius: 999 },
+                ]} // Adjusted size to fill the circle
+              />
+            </Link>
+          </View>
 
-        <View style={styles.stepsContainer}>
-          <Text style={styles.containerButtonText}>Steps</Text>
-          <Link style={styles.stepsTile} href={"/(tabs)/weather"}>
-            <Image
-              source={require("../../assets/images/weatherButtonIcon.png")}
-              style={[
-                styles.icon,
-                { width: "100%", height: "100%", borderRadius: 30 },
-              ]} // Adjusted size to fill the circle
-            />
-          </Link>
-        </View>
-
-        <View style={styles.sleepContainer}>
-          <Text style={styles.containerButtonText}>Sleep</Text>
-          <Link style={styles.sleepTile} href={"/(tabs)/weather"}>
-            <Image
-              source={require("../../assets/images/weatherButtonIcon.png")}
-              style={[
-                styles.icon,
-                { width: "100%", height: "100%", borderRadius: 30 },
-              ]} // Adjusted size to fill the circle
-            />
-          </Link>
+          <View>
+            <Text style={styles.containerButtonText}>Sleep</Text>
+            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+              <Image
+                source={require("../../assets/images/cutePantherSleeping.png")}
+                style={[
+                  styles.icon,
+                  { width: "100%", height: "100%", borderRadius: 999 },
+                ]} // Adjusted size to fill the circle
+              />
+            </Link>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -309,7 +325,9 @@ const styles = StyleSheet.create({
     elevation: 5,
     width: "90%",
     marginBottom: 20,
-    alignSelf: "center", // Center align card
+    alignSelf: "center",
+    borderColor: "#DEDEDE",
+    borderWidth: 1,
   },
   classImage: {
     width: 60,
@@ -375,92 +393,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-  buttonsContainer: {
-    position: "absolute", // Position the container absolutely
-    bottom: 10, // Align it to the bottom of the screen
-    alignSelf: "center", // Center the container horizontally
-    width: "100%", // Take up all the width of the screen
-    height: "50%",
-    borderRightWidth: 1,
-    borderRightColor: "black",
-    borderLeftWidth: 1,
-    borderLeftColor: "black",
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: "black",
-    borderTopColor: "black",
-  },
-  weatherContainer: {
-    position: "absolute",
-    bottom: 30,
-    right: 40,
-  },
-  weatherTile: {
-    width: 120, // Increased width
-    height: 120, // Increased height
-    backgroundColor: "#87ceeb",
-    borderRadius: 60, // Make it circular by setting borderRadius to half of width/height
-    padding: 15,
-    alignItems: "center",
-    justifyContent: "center", // Center content inside the circle
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+
+  tileStyle: {
+    width: 120,
+    height: 120,
   },
 
-  waterContainer: {
-    position: "absolute",
-    bottom: 30,
-    left: 40,
-  },
-  waterTile: {
-    width: 120, // Increased width
-    height: 120, // Increased height
-    backgroundColor: "#87ceeb",
-    borderRadius: 60, // Make it circular by setting borderRadius to half of width/height
-    padding: 15,
-    alignItems: "center",
-    justifyContent: "center", // Center content inside the circle
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-  },
-
-  stepsContainer: {
-    position: "absolute",
-    top: 30,
-    left: 40,
-  },
-  stepsTile: {
-    width: 120, // Increased width
-    height: 120, // Increased height
-    backgroundColor: "#87ceeb",
-    borderRadius: 60, // Make it circular by setting borderRadius to half of width/height
-    padding: 15,
-    alignItems: "center",
-    justifyContent: "center", // Center content inside the circle
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-  },
-
-  sleepContainer: {
-    position: "absolute",
-    top: 30,
-    right: 40,
-  },
-  sleepTile: {
-    width: 120, // Increased width
-    height: 120, // Increased height
-    backgroundColor: "#87ceeb",
-    borderRadius: 60, // Make it circular by setting borderRadius to half of width/height
-    padding: 15,
-    alignItems: "center",
-    justifyContent: "center", // Center content inside the circle
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-  },
   icon: {
     width: 60,
     height: 60,
