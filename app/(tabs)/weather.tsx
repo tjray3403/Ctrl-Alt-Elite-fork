@@ -1,4 +1,12 @@
-import { View, Text, ScrollView, FlatList, StyleSheet, Platform } from "react-native";
+import {
+  ImageBackground,
+  View,
+  Text,
+  ScrollView,
+  FlatList,
+  StyleSheet,
+  Platform,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { styles } from "../../config/styles";
 import TextWeather from "@/components/TextWeather";
@@ -39,7 +47,23 @@ const Weather = () => {
   const formatTime = (timestamp: number | null) => {
     if (!timestamp) return "--";
     const date = new Date(timestamp * 1000);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const getBackgroundImage = (description: string | null) => {
+    if (!description) return require("@/assets/backgrounds/clear.png");
+    const desc = description.toLowerCase();
+    if (desc.includes("clear"))
+      return require("@/assets/backgrounds/clear.png");
+    if (desc.includes("cloud"))
+      return require("@/assets/backgrounds/clear.png");
+    if (desc.includes("rain")) return require("@/assets/backgrounds/clear.png");
+    if (desc.includes("thunderstorm"))
+      return require("@/assets/backgrounds/clear.png");
+    if (desc.includes("snow")) return require("@/assets/backgrounds/clear.png");
+    if (desc.includes("mist") || desc.includes("fog") || desc.includes("haze"))
+      return require("@/assets/backgrounds/clear.png");
+    return require("@/assets/backgrounds/clear.png");
   };
 
   // Function to load current weather data
@@ -113,13 +137,15 @@ const Weather = () => {
 
       // Add the last day's forecast
       dailyForecast.push({
-        date: new Date(data.list[data.list.length - 1].dt * 1000).toDateString(),
+        date: new Date(
+          data.list[data.list.length - 1].dt * 1000
+        ).toDateString(),
         high: dailyHigh,
         low: dailyLow,
       });
 
-      setFiveDayForecast(dailyForecast);  // Store the 5-day forecast in state
-      setHourlyForecast(hourlyForecast);  // Store hourly forecast in state
+      setFiveDayForecast(dailyForecast); // Store the 5-day forecast in state
+      setHourlyForecast(hourlyForecast); // Store hourly forecast in state
     } catch (error) {
       console.error("Error fetching weather data:", error);
     }
@@ -127,92 +153,99 @@ const Weather = () => {
 
   useEffect(() => {
     loadForecast();
-    fiveDayThreeHourForecast();  // Fetch the 5-day forecast
+    fiveDayThreeHourForecast(); // Fetch the 5-day forecast
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#89CFF0" }}>
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
-        {/* Location & Date */}
-        <View style={weatherstyles.headerSection}>
-          <Text style={weatherstyles.cityText}>Prairie View, TX</Text>
-          <Text style={weatherstyles.dateText}>{new Date().toDateString()}</Text>
-        </View>
-  
-        {/* Weather Icon + Temp + Condition */}
-        <View style={weatherstyles.mainCard}>
-          <Text style={weatherstyles.weatherIcon}>🌤️</Text>
-          <Text style={weatherstyles.temperatureText}>
-            {temp?.toFixed(0) ?? 0}° F
-          </Text>
-          <Text style={weatherstyles.skyText}>
-            Feels like {forecast?.feels_like?.toFixed(0) ?? "--"}°F
-          </Text>
-          <Text style={weatherstyles.skyText}>{sky}</Text>
-        </View>
-  
-        
-        
-  
-        {/* Hourly Forecast (Horizontal) */}
-        <Text style={weatherstyles.subHeading}>Hourly Forecast</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {hourlyForecast.length > 0 ? (
-            hourlyForecast.map((hour, index) => (
-              <View key={index} style={[weatherstyles.hourCard, { width: screenWidth * 0.2 }]}>
-                <Text style={weatherstyles.hourTime}>{hour.time}</Text>
-                <Text style={weatherstyles.hourTemp}>{hour.temp.toFixed(0)}°F</Text>
+    <ImageBackground
+      source={getBackgroundImage(sky)}
+      style={weatherstyles.background}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={{ flex: 1, /*backgroundColor: "#89CFF0"*/ }}>
+        <ScrollView contentContainerStyle={{ padding: 20 }}>
+          {/* Location & Date */}
+          <View style={weatherstyles.headerSection}>
+            <Text style={weatherstyles.cityText}>Prairie View, TX</Text>
+            <Text style={weatherstyles.dateText}>
+              {new Date().toDateString()}
+            </Text>
+          </View>
+
+          {/* Weather Icon + Temp + Condition */}
+          <View style={weatherstyles.mainCard}>
+            <Text style={weatherstyles.weatherIcon}>🌤️</Text>
+            <Text style={weatherstyles.temperatureText}>
+              {temp?.toFixed(0) ?? 0}° F
+            </Text>
+            <Text style={weatherstyles.skyText}>
+              Feels like {forecast?.feels_like?.toFixed(0) ?? "--"}°F
+            </Text>
+            <Text style={weatherstyles.skyText}>{sky}</Text>
+          </View>
+
+          {/* Hourly Forecast (Horizontal) */}
+          <Text style={weatherstyles.subHeading}>Hourly Forecast</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {hourlyForecast.length > 0 ? (
+              hourlyForecast.map((hour, index) => (
+                <View
+                  key={index}
+                  style={[weatherstyles.hourCard, { width: screenWidth * 0.2 }]}
+                >
+                  <Text style={weatherstyles.hourTime}>{hour.time}</Text>
+                  <Text style={weatherstyles.hourTemp}>
+                    {hour.temp.toFixed(0)}°F
+                  </Text>
+                </View>
+              ))
+            ) : (
+              <Text style={{ color: "#fff" }}>Loading hourly forecast...</Text>
+            )}
+          </ScrollView>
+
+          {/* 5-Day Forecast (Vertical List) */}
+          <Text style={weatherstyles.subHeading}>5-Day Forecast</Text>
+          <FlatList
+            data={fiveDayForecast}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={weatherstyles.forecastCard}>
+                <Text style={weatherstyles.forecastDate}>{item.date}</Text>
+                <Text style={weatherstyles.forecastHighLow}>
+                  High: {item.high}°F | Low: {item.low}°F
+                </Text>
               </View>
-            ))
-          ) : (
-            <Text style={{ color: "#fff" }}>Loading hourly forecast...</Text>
-          )}
-        </ScrollView>
-  
-        {/* 5-Day Forecast (Vertical List) */}
-        <Text style={weatherstyles.subHeading}>5-Day Forecast</Text>
-        <FlatList
-          data={fiveDayForecast}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <View style={weatherstyles.forecastCard}>
-              <Text style={weatherstyles.forecastDate}>{item.date}</Text>
-              <Text style={weatherstyles.forecastHighLow}>
-                High: {item.high}°F | Low: {item.low}°F
-              </Text>
+            )}
+            scrollEnabled={false} // Let parent ScrollView handle scrolling
+          />
+
+          {/* Stat Row: Humidity + Wind */}
+          <View style={weatherstyles.statRow}>
+            <View style={weatherstyles.statItem}>
+              <Text style={weatherstyles.statLabel}>Humidity</Text>
+              <Text style={weatherstyles.statValue}>{humidity ?? 0}%</Text>
             </View>
-          )}
-
-          
-          scrollEnabled={false} // Let parent ScrollView handle scrolling
-        />
-
-        {/* Stat Row: Humidity + Wind */}
-        <View style={weatherstyles.statRow}>
-          <View style={weatherstyles.statItem}>
-            <Text style={weatherstyles.statLabel}>Humidity</Text>
-            <Text style={weatherstyles.statValue}>{humidity ?? 0}%</Text>
+            <View style={weatherstyles.statItem}>
+              <Text style={weatherstyles.statLabel}>Wind</Text>
+              <Text style={weatherstyles.statValue}>{wind ?? 0} mph</Text>
+            </View>
           </View>
-          <View style={weatherstyles.statItem}>
-            <Text style={weatherstyles.statLabel}>Wind</Text>
-            <Text style={weatherstyles.statValue}>{wind ?? 0} mph</Text>
-          </View>
-        </View>
 
-        {/* Sunrise & Sunset */}
-        <View style={weatherstyles.statRow}>
-          <View style={weatherstyles.statItem}>
-            <Text style={weatherstyles.statLabel}>Sunrise</Text>
-            <Text style={weatherstyles.statValue}>{formatTime(sunrise)}</Text>
+          {/* Sunrise & Sunset */}
+          <View style={weatherstyles.statRow}>
+            <View style={weatherstyles.statItem}>
+              <Text style={weatherstyles.statLabel}>Sunrise</Text>
+              <Text style={weatherstyles.statValue}>{formatTime(sunrise)}</Text>
+            </View>
+            <View style={weatherstyles.statItem}>
+              <Text style={weatherstyles.statLabel}>Sunset</Text>
+              <Text style={weatherstyles.statValue}>{formatTime(sunset)}</Text>
+            </View>
           </View>
-          <View style={weatherstyles.statItem}>
-            <Text style={weatherstyles.statLabel}>Sunset</Text>
-            <Text style={weatherstyles.statValue}>{formatTime(sunset)}</Text>
-          </View>
-        </View>
-
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 };
 
@@ -222,6 +255,9 @@ const weatherstyles = StyleSheet.create({
     backgroundColor: "#89CFF0",
     padding: 20,
     justifyContent: "center",
+  },
+  background: {
+    flex: 1,
   },
   headerSection: {
     alignItems: "center",
