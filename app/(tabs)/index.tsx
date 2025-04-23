@@ -91,10 +91,11 @@ export default function HomeScreen() {
           style={styles.classCard} 
           onPress={() => router.push(`/class/list_classes_screen`)}
         >
-          <Image 
-            source={nextClass.imageUrl ? { uri: nextClass.imageUrl } : require('../../assets/images/pantherpace_logo.PNG')} 
-            style={styles.classImage} 
+          <Image
+            source={nextClass.imageUrl ? { uri: nextClass.imageUrl } : require('../../assets/images/app_logo.png')}
+            style={styles.classImage}
           />
+
           <View style={styles.classInfoContainer}>
             <Text style={styles.className}>{nextClass.name}</Text>
             <Text style={styles.classTime}>🕒 {nextClass.startTime || "No Time Set"}</Text>
