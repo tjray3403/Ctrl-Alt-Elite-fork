@@ -8,6 +8,8 @@ export default function Index() {
   const [user, setUser] = useState<null | User>(null);
   const [loading, setLoading] = useState(true);
 
+  
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
