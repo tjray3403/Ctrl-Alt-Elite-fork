@@ -120,6 +120,34 @@ export default function HomeScreen() {
         style={styles.logo}
       />
       <Text style={styles.greeting}>Hi, {userName || "Student"}!</Text>
+      <Link href="/" style={{ width: "100%", alignItems: "center" }}>
+        <View style={{ width: "100%", flexDirection: "row", gap: 10, justifyContent: "space-between", padding: 10 }}>
+          <Text
+            style={{ alignSelf: "flex-start", fontSize: 16, fontWeight: 500 }}
+          >
+            Navigate Campus!
+          </Text>
+          <Text
+            style={{ alignSelf: "flex-end", fontSize: 16, fontWeight: 500 }}
+          >
+            Click Below
+          </Text>
+        </View>
+
+        <Image
+          source={require("../../assets/backgrounds/map-background.png")}
+          style={{
+            width: "100%",
+            height: 300,
+            resizeMode: "cover",
+            borderRadius: 12,
+            marginTop: 10,
+
+            borderColor: "#000",
+            borderWidth: 2,
+          }}
+        />
+      </Link>
 
       {/*<Text style={styles.profileInfo}>Welcome to the Panther Pace App!</Text>
 
@@ -130,50 +158,62 @@ export default function HomeScreen() {
 
       {/* Display the next class */}
       {nextClass ? (
-        <TouchableOpacity
-          style={styles.classCard}
-          onPress={() => router.push(`/class/list_classes_screen`)}
-        >
-          <Image
-            source={
-              nextClass.imageUrl
-                ? { uri: nextClass.imageUrl }
-                : require("@/pantherpace_logo.jpg")
-            }
-            style={styles.classImage}
-          />
-          <View style={styles.classInfoContainer}>
-            <Text style={styles.className}>{nextClass.name}</Text>
-            <Text style={styles.classTime}>
-              🕒 {nextClass.startTime || "No Time Set"}
-            </Text>
-            <Text style={styles.classBuilding}>
-              📍 {nextClass.building || "Unknown Building"}
-            </Text>
-          </View>
-        </TouchableOpacity>
+        <View style={{ width: "100%", alignItems: "flex-start" }}>
+          <Text style={{ padding: 15, fontSize: 16, fontWeight: 500 }}>
+            Next Class:
+          </Text>
+          <TouchableOpacity
+            style={styles.classCard}
+            onPress={() => router.push(`/class/list_classes_screen`)}
+          >
+            <Image
+              source={
+                nextClass.imageUrl
+                  ? { uri: nextClass.imageUrl }
+                  : require("@/pantherpace_logo.jpg")
+              }
+              style={styles.classImage}
+            />
+            <View style={styles.classInfoContainer}>
+              <Text style={styles.className}>{nextClass.name}</Text>
+              <Text style={styles.classTime}>
+                🕒 {nextClass.startTime || "No Time Set"}
+              </Text>
+              <Text style={styles.classBuilding}>
+                📍 {nextClass.building || "Unknown Building"}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       ) : (
         // If no upcoming classes, show a message & options
         <View style={styles.noClassContainer}>
           <Text style={styles.noClassText}>No upcoming classes today.</Text>
-
-          {/* Add Class Button */}
-          <TouchableOpacity
-            style={styles.addClassButton}
-            onPress={() => router.push("/class/add_class_screen")}
-          >
-            <Text style={styles.buttonText}>➕ Add a Class</Text>
-          </TouchableOpacity>
-
-          {/* View All Classes Button */}
-          <TouchableOpacity
-            style={styles.viewClassesButton}
-            onPress={() => router.push("/class/list_classes_screen")}
-          >
-            <Text style={styles.buttonText}>📚 View Classes</Text>
-          </TouchableOpacity>
         </View>
       )}
+      {/* Add Class Button */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-evenly",
+          width: "100%",
+        }}
+      >
+        <TouchableOpacity
+          style={styles.addClassButton}
+          onPress={() => router.push("/class/add_class_screen")}
+        >
+          <Text style={styles.buttonText}>➕ Add a Class</Text>
+        </TouchableOpacity>
+
+        {/* View All Classes Button */}
+        <TouchableOpacity
+          style={styles.viewClassesButton}
+          onPress={() => router.push("/class/list_classes_screen")}
+        >
+          <Text style={styles.buttonText}>📚 View Classes</Text>
+        </TouchableOpacity>
+      </View>
 
       {/*<TouchableOpacity style={styles.primaryButton}>
         <Text style={styles.buttonText}>Start Workout</Text>
@@ -203,7 +243,7 @@ export default function HomeScreen() {
           <View>
             <Text style={styles.containerButtonText}>Weather</Text>
             <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
-            <Image
+              <Image
                 source={require("../../assets/images/sunny-day.png")}
                 style={[
                   styles.icon,
@@ -370,8 +410,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
-    marginBottom: 10,
-    alignSelf: "center", // Center align button
   },
   viewClassesButton: {
     backgroundColor: "#28a745",

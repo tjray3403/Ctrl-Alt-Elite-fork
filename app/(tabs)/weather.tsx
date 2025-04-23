@@ -50,19 +50,30 @@ const Weather = () => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  const isDaytime = () => {
+    const currentTime = Math.floor(Date.now() / 1000); // Hora actual en segundos (UNIX timestamp)
+    if (sunrise && sunset) {
+      return currentTime >= sunrise && currentTime < sunset; // Devuelve true si es de día
+    }
+    return false; // Por defecto, considera que es de noche si no hay datos
+  };
+
   const getBackgroundImage = (description: string | null) => {
-    if (!description) return require("@/assets/backgrounds/clear.png");
-    const desc = description.toLowerCase();
-    if (desc.includes("clear"))
+    const desc = description?.toLowerCase();
+    if (isDaytime()) {
+      return require("@/assets/backgrounds/night.png");
+    } else if (desc?.includes("clear"))
       return require("@/assets/backgrounds/clear.png");
-    if (desc.includes("cloud"))
+    else if (desc?.includes("cloud"))
       return require("@/assets/backgrounds/clear.png");
-    if (desc.includes("rain")) return require("@/assets/backgrounds/clear.png");
-    if (desc.includes("thunderstorm"))
+    else if (desc?.includes("rain"))
       return require("@/assets/backgrounds/clear.png");
-    if (desc.includes("snow")) return require("@/assets/backgrounds/clear.png");
-    if (desc.includes("mist") || desc.includes("fog") || desc.includes("haze"))
+    else if (desc?.includes("thunderstorm"))
       return require("@/assets/backgrounds/clear.png");
+    else if (desc?.includes("snow"))
+      return require("@/assets/backgrounds/clear.png");
+    else
+      desc?.includes("mist") || desc?.includes("fog") || desc?.includes("haze");
     return require("@/assets/backgrounds/clear.png");
   };
 
@@ -94,46 +105,51 @@ const Weather = () => {
 
       // Process the 5-day forecast
       const dailyForecast = [];
-      let currentDate = null;
+      let currentDate: number | null = null;
       let dailyHigh = -Infinity;
       let dailyLow = Infinity;
 
       // Process hourly forecast
-      const hourlyForecast = [];
+      const hourlyForecast: React.SetStateAction<any[]> = [];
 
-      data.list.forEach((item) => {
-        const date = new Date(item.dt * 1000); // Convert to JavaScript Date object
-        const day = date.getDate();
+      data.list.forEach(
+        (item: {
+          dt: number | null;
+          main: { temp: any; temp_max: number; temp_min: number };
+        }) => {
+          const date = item.dt ? new Date(item.dt * 1000) : new Date(); // Convert to JavaScript Date object or use current date if null
+          const day = date.getDate();
 
-        // Process hourly forecast for the current day
-        if (date.getDate() === new Date().getDate()) {
-          hourlyForecast.push({
-            time: formatTime(item.dt),
-            temp: item.main.temp,
-          });
-        }
-
-        // Check if we are still on the same day or a new day
-        if (currentDate !== day) {
-          // If it's a new day, save the last day's forecast and reset
-          if (currentDate !== null) {
-            dailyForecast.push({
-              date: new Date(item.dt * 1000).toDateString(),
-              high: dailyHigh,
-              low: dailyLow,
+          // Process hourly forecast for the current day
+          if (date.getDate() === new Date().getDate()) {
+            hourlyForecast.push({
+              time: formatTime(item.dt),
+              temp: item.main.temp,
             });
           }
 
-          // Reset for the new day
-          currentDate = day;
-          dailyHigh = -Infinity;
-          dailyLow = Infinity;
-        }
+          // Check if we are still on the same day or a new day
+          if (currentDate !== day) {
+            // If it's a new day, save the last day's forecast and reset
+            if (currentDate !== null) {
+              dailyForecast.push({
+                date: new Date(item.dt * 1000).toDateString(),
+                high: dailyHigh,
+                low: dailyLow,
+              });
+            }
 
-        // Update high and low temperatures for the current day
-        if (item.main.temp_max > dailyHigh) dailyHigh = item.main.temp_max;
-        if (item.main.temp_min < dailyLow) dailyLow = item.main.temp_min;
-      });
+            // Reset for the new day
+            currentDate = day;
+            dailyHigh = -Infinity;
+            dailyLow = Infinity;
+          }
+
+          // Update high and low temperatures for the current day
+          if (item.main.temp_max > dailyHigh) dailyHigh = item.main.temp_max;
+          if (item.main.temp_min < dailyLow) dailyLow = item.main.temp_min;
+        }
+      );
 
       // Add the last day's forecast
       dailyForecast.push({
@@ -156,13 +172,17 @@ const Weather = () => {
     fiveDayThreeHourForecast(); // Fetch the 5-day forecast
   }, []);
 
+  const emojiHandler = () => {
+    return isDaytime() ? "☀️" : "🌙"; // Devuelve un emoji según sea de día o de noche
+  };
+
   return (
     <ImageBackground
       source={getBackgroundImage(sky)}
       style={weatherstyles.background}
       resizeMode="cover"
     >
-      <SafeAreaView style={{ flex: 1, /*backgroundColor: "#89CFF0"*/ }}>
+      <SafeAreaView style={{ flex: 1 /*backgroundColor: "#89CFF0"*/ }}>
         <ScrollView contentContainerStyle={{ padding: 20 }}>
           {/* Location & Date */}
           <View style={weatherstyles.headerSection}>
@@ -174,7 +194,7 @@ const Weather = () => {
 
           {/* Weather Icon + Temp + Condition */}
           <View style={weatherstyles.mainCard}>
-            <Text style={weatherstyles.weatherIcon}>🌤️</Text>
+            <Text style={weatherstyles.weatherIcon}>{emojiHandler()}</Text>
             <Text style={weatherstyles.temperatureText}>
               {temp?.toFixed(0) ?? 0}° F
             </Text>
@@ -251,13 +271,13 @@ const Weather = () => {
 
 const weatherstyles = StyleSheet.create({
   weatherScreen: {
-    flex: 1,
     backgroundColor: "#89CFF0",
     padding: 20,
     justifyContent: "center",
   },
   background: {
     flex: 1,
+    width: "100%",
   },
   headerSection: {
     alignItems: "center",
@@ -278,6 +298,7 @@ const weatherstyles = StyleSheet.create({
     padding: 30,
     alignItems: "center",
     marginBottom: 30,
+    backdropFilter: "blur(15px)",
   },
   weatherIcon: {
     fontSize: 50,
@@ -294,13 +315,16 @@ const weatherstyles = StyleSheet.create({
   },
   statRow: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
+    backdropFilter: "blur(15px)",
+    marginBottom: 10,
+    gap: 10,
   },
   statItem: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     borderRadius: 15,
     padding: 20,
-    width: "40%",
+    flex: 1,
     alignItems: "center",
   },
   statLabel: {
@@ -316,6 +340,7 @@ const weatherstyles = StyleSheet.create({
   // 5-Day Forecast Styles
   forecastCard: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backdropFilter: "blur(15px)",
     borderRadius: 15,
     padding: 15,
     marginBottom: 10,
@@ -334,6 +359,7 @@ const weatherstyles = StyleSheet.create({
   // Hourly Forecast Styles
   hourCard: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
+
     borderRadius: 15,
     padding: 10,
     marginRight: 15,
@@ -354,6 +380,7 @@ const weatherstyles = StyleSheet.create({
   subHeading: {
     fontSize: 18,
     fontWeight: "bold",
+
     color: "#fff",
     marginBottom: 10,
   },
