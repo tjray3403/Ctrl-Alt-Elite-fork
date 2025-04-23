@@ -82,14 +82,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="weather"
         options={{
-          href: null,
           title: "Weather",
           tabBarIcon: ({ color }) => (
             <Ionicons name="sunny" size={28} color={color} />
           ),
         }}
       />
-      <Tabs.Screen
+     {/*} <Tabs.Screen
         name="steps"
         options={{
           title: "Steps",
@@ -98,6 +97,7 @@ export default function TabLayout() {
           ),
         }}
       />
+      */}
     </Tabs>
     
   );
