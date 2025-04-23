@@ -167,11 +167,11 @@ export default function HomeScreen() {
             onPress={() => router.push(`/class/list_classes_screen`)}
           >
             <Image
-              source={
-                nextClass.imageUrl
-                  ? { uri: nextClass.imageUrl }
-                  : require("@/pantherpace_logo.jpg")
-              }
+              //source={
+                //nextClass.imageUrl
+              //    ? { uri: nextClass.imageUrl }
+                  //: require("@/pantherpace_logo.jpg")
+           //   }
               style={styles.classImage}
             />
             <View style={styles.classInfoContainer}>
@@ -242,7 +242,7 @@ export default function HomeScreen() {
         <View style={{ gap: 20 }}>
           <View>
             <Text style={styles.containerButtonText}>Weather</Text>
-            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+            <Link style={styles.tileStyle} href={"/other/weather"}>
               <Image
                 source={require("../../assets/images/sunny-day.png")}
                 style={[
@@ -254,7 +254,7 @@ export default function HomeScreen() {
           </View>
           <View>
             <Text style={styles.containerButtonText}>Water</Text>
-            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+            <Link style={styles.tileStyle} href={"/Water_tracking/Water"}>
               <Image
                 source={require("../../assets/images/drinking-water.png")}
                 style={[
@@ -269,7 +269,7 @@ export default function HomeScreen() {
         <View style={{ gap: 20 }}>
           <View>
             <Text style={styles.containerButtonText}>Steps</Text>
-            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+            <Link style={styles.tileStyle} href={"/Step_tracking/steps"}>
               <Image
                 source={require("../../assets/images/running-fast.png")}
                 style={[
@@ -282,7 +282,7 @@ export default function HomeScreen() {
 
           <View>
             <Text style={styles.containerButtonText}>Sleep</Text>
-            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+            <Link style={styles.tileStyle} href={"/other/sleep"}>
               <Image
                 source={require("../../assets/images/cutePantherSleeping.png")}
                 style={[
@@ -406,20 +406,20 @@ const styles = StyleSheet.create({
     textAlign: "center", // Center align text
   },
   addClassButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#8A56AC",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
   },
   viewClassesButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#8A56AC",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     // Center align button
   },
   primaryButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#8A56AC",
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 8,

@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 16,
-    color: '#007bff',
+    color: '#8A56AC',
     fontWeight: 'bold',
     margin: 16,
   },

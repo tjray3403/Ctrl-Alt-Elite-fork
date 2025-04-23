@@ -97,6 +97,18 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     textAlign: "center",
   },
+  linkButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "#007BFF",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  linkText: {
+    color: "#fff",
+    fontSize: 16,
+  },
 
   weatherContainer: {
     display: "flex",

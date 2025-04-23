@@ -133,7 +133,7 @@ const Weather = () => {
             // If it's a new day, save the last day's forecast and reset
             if (currentDate !== null) {
               dailyForecast.push({
-                date: new Date(item.dt * 1000).toDateString(),
+                date: item.dt ? new Date(item.dt * 1000).toDateString() : "Invalid Date",
                 high: dailyHigh,
                 low: dailyLow,
               });

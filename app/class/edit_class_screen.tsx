@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   uploadButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#8A56AC',
     padding: 10,
     borderRadius: 6,
     marginBottom: 12,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 16,
-    color: '#007bff',
+    color: '#8A56AC',
     fontWeight: 'bold',
     marginBottom: 10,
   },
