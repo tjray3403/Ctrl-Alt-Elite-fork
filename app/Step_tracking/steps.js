@@ -1,282 +1,136 @@
 import React, { useEffect, useState } from "react";
-
-import { StatusBar } from "expo-status-bar";
-
 import {
-
- StyleSheet,
-
- Text,
-
- View,
-
- ImageBackground,
-
- Dimensions,
-
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Image,
 } from "react-native";
-
 import { Pedometer } from "expo-sensors";
-
 import CircularProgress from "react-native-circular-progress-indicator";
 
- 
-
-export default function App() {
-
- const [PedomaterAvailability, SetPedomaterAvailability] = useState("");
-
- const [StepCount, SetStepCount] = useState(0);
-
- 
-
- var WindowHeight = Dimensions.get("window").height;
-
- 
-
- var Dist = StepCount / 1300;
-
- var DistanceCovered = Dist.toFixed(4);
-
- 
-
- var cal = DistanceCovered * 60;
-
- var caloriesBurnt = cal.toFixed(4);
-
- React.useEffect(() => {
-
-   subscribe();
-
- }, []);
-
- 
-
- subscribe = () => {
-
-   const subscription = Pedometer.watchStepCount((result) => {
-
-     SetStepCount(result.steps);
-
-   });
-
- 
-
-   Pedometer.isAvailableAsync().then(
-
-     (result) => {
-
-       SetPedomaterAvailability(String(result));
-
-     },
-
-     (error) => {
-
-       SetPedomaterAvailability(error);
-
-     }
-
-   );
-
- };
-
- 
-
- return (
-
-   <View style={styles.container}>
-
-     <ImageBackground
-
-       style={{ flex: 1 }}
-
-    
-       source={require("../../assets/images/running-fast.png")}
-
-       resizeMode="cover"
-
-     >
-
-       <View style={{ flex: 1, justifyContent: "center" }}>
-
-         <Text style={styles.headingDesign}>
-
-           Is Pedometer available on the device : {PedomaterAvailability}
-
-         </Text>
-
-       </View>
-
-       <View style={{ flex: 3 }}>
-
-         <CircularProgress
-
-           value={StepCount}
-
-           maxValue={6500}
-
-           radius={210}
-
-           textColor={"#ecf0f1"}
-
-           activeStrokeColor={"#f39c12"}
-
-           inActiveStrokeColor={"#9b59b6"}
-
-           inActiveStrokeOpacity={0.5}
-
-           inActiveStrokeWidth={40}
-
-           activeStrokeWidth={40}
-
-           title={"Step Count"}
-
-           titleColor={"#ecf0f1"}
-
-           titleStyle={{ fontWeight: "bold" }}
-
-         />
-
-       </View>
-
- 
-
-       <View style={{ flex: 1, justifyContent: "center" }}>
-
-         <View style={{ flex: 1 }}>
-
-           <Text
-
-             style={[
-
-               styles.textDesign,
-
-               { paddingLeft: 20, marginLeft: '23%' },
-
-             ]}
-
-           >
-
-             Target : 6500 steps(5kms)
-
-           </Text>
-
-         </View>
-
- 
-
-         <View style={{ flex: 1 }}>
-
-           <Text
-
-             style={[
-
-               styles.textDesign,
-
-               { width: "93%", paddingLeft: 20, marginLeft: '-3.5%' },
-
-             ]}
-
-           >
-
-             Distance Covered : {DistanceCovered} km
-
-           </Text>
-
-         </View>
-
- 
-
-         <View style={{ flex: 1 }}>
-
-           <Text
-
-             style={[
-
-               styles.textDesign,
-
-               {  paddingLeft: 10, marginLeft: '23%' },
-
-             ]}
-
-           >
-
-             Calories Burnt : {caloriesBurnt}
-
-           </Text>
-
-         </View>
-
- 
-
-         <StatusBar style="auto" />
-
-       </View>
-
-     </ImageBackground>
-
-   </View>
-
- );
-
+export default function Steps() {
+  const [PedometerAvailability, setPedometerAvailability] = useState("");
+  const [stepCount, updateStepCount] = useState(0);
+  const [stepGoal, setStepGoal] = useState(10000); // Default goal is 10,000 steps
+  const [inputGoal, setInputGoal] = useState(""); // Temporary state for user input
+
+  // Approximate step length in meters
+  const stepLengthInMeters = 0.762;
+
+  // Calculate distance covered in miles
+  const distanceCoveredInMiles = (
+    (stepCount * stepLengthInMeters) /
+    1609.34
+  ).toFixed(2); // Convert to miles and round to 2 decimal places
+
+  useEffect(() => {
+    // Subscribe to step count updates
+    const subscription = Pedometer.watchStepCount((result) => {
+      updateStepCount(result.steps);
+    });
+
+    // Check if the Pedometer is available on the device
+    Pedometer.isAvailableAsync().then(
+      (result) => {
+        setPedometerAvailability(String(result));
+      },
+      (error) => {
+        setPedometerAvailability("Error: " + (error.message || "Unknown error"));
+      }
+    );
+
+    // Cleanup function to unsubscribe from the pedometer
+    return () => {
+      subscription && subscription.remove();
+    };
+  }, []); // Empty dependency array ensures this runs only once
+
+  const handleSetGoal = () => {
+    const numericGoal = Number(inputGoal);
+    if (isNaN(numericGoal) || numericGoal <= 0) {
+      Alert.alert("Invalid Input", "Please enter a valid positive number for the step goal.");
+    } else {
+      setStepGoal(numericGoal);
+      Alert.alert("Step Goal Updated", `Your new step goal is ${numericGoal} steps.`);
+      Keyboard.dismiss(); // Dismiss the keyboard after setting the goal
+    }
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <Text style={styles.text}>Step Tracker!</Text>
+        <View>
+          <CircularProgress
+            value={stepCount}
+            maxValue={stepGoal} // Dynamically set the goal
+            radius={100}
+            textColor={"#000"}
+            activeStrokeColor={"#96ef7a"} // Color of the progress indicator
+            inActiveStrokeColor={"#d3d3d3"} // Gray for inactive progress
+            inActiveStrokeOpacity={0.5}
+            activeStrokeWidth={15}
+            inActiveStrokeWidth={15}
+          >
+            {/* Image in the center of the progress circle */}
+            <Image
+              source={require("../../assets/images/running-fast.png")}
+              style={styles.image}
+              resizeMode="contain"
+            />
+          </CircularProgress>
+        </View>
+        <Text style={styles.text}>Steps: {stepCount}</Text>
+        <Text style={styles.text}>Goal: {stepGoal} steps</Text>
+        <Text style={styles.text}>Distance Covered: {distanceCoveredInMiles} miles</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your step goal"
+          keyboardType="numeric"
+          value={inputGoal}
+          onChangeText={(text) => setInputGoal(text)} // Update the temporary input state
+          onSubmitEditing={Keyboard.dismiss} // Dismiss the keyboard when the user presses "Done"
+        />
+        <Button title="Set Step Goal" onPress={handleSetGoal} />
+        <StatusBar style="dark" />
+      </View>
+    </TouchableWithoutFeedback>
+  );
 }
 
- 
-
 const styles = StyleSheet.create({
-
- container: {
-
-   flex: 1,
-
-   backgroundColor: "#fff",
-
- },
-
- headingDesign: {
-
-   backgroundColor: "rgba(155, 89, 182,0.5)",
-
- 
-
-   alignSelf: "center",
-
-   fontSize: 20,
-
-   color: "white",
-
-   fontWeight: "bold",
-
-   fontFamily: "Papyrus",
-
- },
-
- textDesign: {
-
-   backgroundColor: "rgba(155, 89, 182,0.5)",
-
-   height: 50,
-
-   width : '85%',
-
-   borderColor: "white",
-
-   borderWidth: 1,
-
-   borderRadius: 20,
-
-   overflow: "hidden",
-
-   fontSize: 25,
-
-   color: "white",
-
-   fontWeight: "bold",
-
-   fontFamily: "Papyrus",
-
- },
-
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center", // Center the circle in the screen
+    backgroundColor: "#fff",
+  },
+  text: {
+    fontSize: 16,
+    color: "#000",
+    fontWeight: "bold",
+    textAlign: "center",
+    marginVertical: 10,
+  },
+  input: {
+    height: 40,
+    borderColor: "#6A0DAD",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginTop: 20,
+    width: "80%",
+    textAlign: "center",
+  },
+  image: {
+    width: 80, // Adjust the size of the image
+    height: 80,
+  },
 });
 
- 
