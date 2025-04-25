@@ -3,6 +3,7 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { View } from "react-native";
 
+
 export default function TabLayout() {
   return (
     <Tabs
@@ -99,6 +100,8 @@ export default function TabLayout() {
       />
       */}
     </Tabs>
-    
+   
   );
 }
+
+

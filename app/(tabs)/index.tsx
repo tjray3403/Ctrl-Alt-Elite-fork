@@ -254,7 +254,7 @@ export default function HomeScreen() {
           </View>
           <View>
             <Text style={styles.containerButtonText}>Water</Text>
-            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+            <Link style={styles.tileStyle} href={"/Water_tracking/Water"}>
               <Image
                 source={require("../../assets/images/drinking-water.png")}
                 style={[
@@ -269,7 +269,7 @@ export default function HomeScreen() {
         <View style={{ gap: 20 }}>
           <View>
             <Text style={styles.containerButtonText}>Steps</Text>
-            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+            <Link style={styles.tileStyle} href={"/Step_tracking/steps"}>
               <Image
                 source={require("../../assets/images/running-fast.png")}
                 style={[
@@ -282,7 +282,7 @@ export default function HomeScreen() {
 
           <View>
             <Text style={styles.containerButtonText}>Sleep</Text>
-            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
+            <Link style={styles.tileStyle} href={"/(tabs)/sleep"}>
               <Image
                 source={require("../../assets/images/cutePantherSleeping.png")}
                 style={[
