@@ -75,11 +75,11 @@ const ListClassesScreen: React.FC = () => {
       <Text style={styles.title}>My Classes</Text>
 
       <View style={styles.buttonContainer}>
-        <Button title="Add Class" onPress={() => router.push('/class/add_class_screen')} />
+        <Button color="#8A56AC" title="Add Class" onPress={() => router.push('/class/add_class_screen')} />
         {editMode ? (
           <Button title="Cancel" onPress={() => setEditMode(false)} color="red" />
         ) : (
-          <Button title="Edit Classes" onPress={() => setEditMode(true)} />
+          <Button color="#8A56AC" title="Edit Classes" onPress={() => setEditMode(true)} />
         )}
       </View>
 
@@ -91,7 +91,8 @@ const ListClassesScreen: React.FC = () => {
             onPress={() => handleClassSelect(item.id)}
           >
             <Image
-              source={item.imageUrl ? { uri: item.imageUrl } : require('@/pantherpace_logo.jpg')}
+              //source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/images/logo-login.png')}
+              
               style={styles.cardImage}
             />
             <View style={styles.cardContent}>
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 16,
-    color: '#007bff',
+    color: '#8A56AC',
     fontWeight: 'bold',
     marginBottom: 10,
   },

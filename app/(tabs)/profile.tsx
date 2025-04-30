@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, Image } from "react-native";
-import { getAuth, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Image,
+} from "react-native";
+import {
+  getAuth,
+  signOut,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from "firebase/auth";
 import { useRouter } from "expo-router";
 import { db } from "../../config/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -12,7 +26,11 @@ export default function ProfileScreen() {
   const user = auth.currentUser;
   const userId = user?.uid;
 
-  const [userData, setUserData] = useState({ name: "", dob: "", weight: "" });
+  const [userData, setUserData] = useState({
+    name: "",
+    dob: "",
+    weight: "",
+  });
 
   // State for updating info
   const [newName, setNewName] = useState("");
@@ -36,7 +54,11 @@ export default function ProfileScreen() {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setUserData(docSnap.data() as { name: string; dob: string; weight: string });
+          setUserData(docSnap.data() as {
+            name: string;
+            dob: string;
+            weight: string;
+          });
         }
       } catch (error) {
         console.error("❌ Firestore Fetch Error:", error);
@@ -70,8 +92,8 @@ export default function ProfileScreen() {
       Alert.alert("✅ Profile Updated!", "Your information has been saved.");
     } catch (error) {
       if (error instanceof Error && "code" in error) {
-      console.error("❌ Firestore Update Error:", error);
-      Alert.alert("❌ Update Failed", error.message);
+        console.error("❌ Firestore Update Error:", error);
+        Alert.alert("❌ Update Failed", error.message);
       }
     }
   };
@@ -83,13 +105,15 @@ export default function ProfileScreen() {
     }
 
     try {
-
       if (!user) {
         console.error("No authenticated user found.");
         return;
       }
 
-      const credential = EmailAuthProvider.credential(user.email!, currentPassword);
+      const credential = EmailAuthProvider.credential(
+        user.email!,
+        currentPassword
+      );
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPassword);
 
@@ -99,9 +123,13 @@ export default function ProfileScreen() {
       Alert.alert("✅ Success", "Your password has been updated.");
     } catch (error) {
       if (error instanceof Error && "code" in error) {
-      console.error("❌ Password Update Error:", error);
-      Alert.alert("❌ Error", error.code === "auth/wrong-password" ? "Incorrect current password." : error.message);
-    
+        console.error("❌ Password Update Error:", error);
+        Alert.alert(
+          "❌ Error",
+          error.code === "auth/wrong-password"
+            ? "Incorrect current password."
+            : error.message
+        );
       }
     }
   };
@@ -114,34 +142,60 @@ export default function ProfileScreen() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        {/* Profile View */}
         {!isEditing ? (
           <>
-            <Image source={{ uri: "https://via.placeholder.com/150" }} style={styles.profileImage} />
-            <Text style={styles.profileName}>{userData.name || "User"}</Text>
-            <Text style={styles.profileInfo}>🎂 Age: {userData.dob || "--"}</Text>
-            <Text style={styles.profileInfo}>⚖ Weight: {userData.weight || "--"} lbs</Text>
+            <Image
+              source={{ uri: "https://via.placeholder.com/150" }}
+              style={styles.profileImage}
+            />
+            <Text style={styles.profileName}>
+              {userData.name || "User"}
+            </Text>
+            <Text style={styles.profileInfo}>
+              🎂 Age: {userData.dob || "--"}
+            </Text>
+            <Text style={styles.profileInfo}>
+              ⚖ Weight: {userData.weight || "--"} lbs
+            </Text>
 
-            <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.primaryButton}>
+            <TouchableOpacity
+              onPress={() => setIsEditing(true)}
+              style={styles.primaryButton}
+            >
               <Text style={styles.buttonText}>Edit Profile</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+            {/* ✅ Minimal Settings Link */}
+            <TouchableOpacity
+              onPress={() => router.push("/settings")}
+              style={styles.linkButton}
+            >
+              <Text style={styles.linkText}>⚙️ Settings</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={styles.logoutButton}
+            >
               <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
           </>
         ) : (
           <>
-            {/* Edit Profile View */}
             <Text style={styles.title}>Edit Profile</Text>
 
-            {/* Update Name */}
-            <TextInput style={styles.input} value={newName} onChangeText={setNewName} placeholder="Enter New Name" />
-
-            {/* Update DOB */}
-            <TextInput style={styles.input} value={newDOB} onChangeText={setNewDOB} placeholder="Enter Date of Birth (YYYY-MM-DD)" />
-
-            {/* Update Weight */}
+            <TextInput
+              style={styles.input}
+              value={newName}
+              onChangeText={setNewName}
+              placeholder="Enter New Name"
+            />
+            <TextInput
+              style={styles.input}
+              value={newDOB}
+              onChangeText={setNewDOB}
+              placeholder="Enter Date of Birth (YYYY-MM-DD)"
+            />
             <TextInput
               style={styles.input}
               value={newWeight}
@@ -149,12 +203,13 @@ export default function ProfileScreen() {
               placeholder="Enter Weight (lbs)"
               keyboardType="numeric"
             />
-
-            <TouchableOpacity onPress={updateUser} style={styles.primaryButton}>
+            <TouchableOpacity
+              onPress={updateUser}
+              style={styles.primaryButton}
+            >
               <Text style={styles.buttonText}>Save Changes</Text>
             </TouchableOpacity>
 
-            {/* Update Password */}
             <TextInput
               style={styles.input}
               placeholder="Current Password"
@@ -169,12 +224,17 @@ export default function ProfileScreen() {
               value={newPassword}
               onChangeText={setNewPassword}
             />
-
-            <TouchableOpacity onPress={handleChangePassword} style={styles.secondaryButton}>
+            <TouchableOpacity
+              onPress={handleChangePassword}
+              style={styles.secondaryButton}
+            >
               <Text style={styles.buttonText}>Update Password</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setIsEditing(false)} style={styles.logoutButton}>
+            <TouchableOpacity
+              onPress={() => setIsEditing(false)}
+              style={styles.logoutButton}
+            >
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
           </>

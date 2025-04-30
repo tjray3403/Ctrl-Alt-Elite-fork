@@ -59,7 +59,7 @@ const ClassDetailScreen: React.FC = () => {
 
       <ScrollView style={styles.container}>
         <Image
-          source={classData.imageUrl ? { uri: classData.imageUrl } : require('@/pantherpace_logo.jpg')}
+          //source={classData.imageUrl ? { uri: classData.imageUrl } : require('../../assets/images/pantherpace_logo.png')}
           style={styles.bannerImage}
         />
 
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 16,
-    color: '#007bff',
+    color: '#8A56AC',
     fontWeight: 'bold',
     margin: 16,
   },
