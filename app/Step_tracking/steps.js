@@ -18,6 +18,9 @@ import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { format } from "date-fns";
 
+
+import { Platform } from "react-native"; // add this at the top with other imports
+
 export default function Steps() {
   const [PedometerAvailability, setPedometerAvailability] = useState("");
   const [stepCount, updateStepCount] = useState(0);
@@ -44,39 +47,21 @@ export default function Steps() {
       updateStepCount(result.steps);
     });
 
+    // Check if pedometer is available
     Pedometer.isAvailableAsync().then(
       (result) => setPedometerAvailability(String(result)),
       (error) => setPedometerAvailability("Error: " + error?.message)
     );
+  } else {
+    // For web, skip tracking
+    setPedometerAvailability("Not supported on web");
+  }
 
-    return () => {
-      subscription && subscription.remove();
-    };
-  }, []);
-
-  // Firestore Sync
-  useEffect(() => {
-    if (!userId) return;
-    const date = format(new Date(), "yyyy-MM-dd");
-    const ref = doc(db, "users", userId, "dailyStats", date);
-
-    const syncSteps = async () => {
-      const snapshot = await getDoc(ref);
-      if (snapshot.exists()) {
-        await updateDoc(ref, {
-          stepCount,
-          stepGoal,
-        });
-      } else {
-        await setDoc(ref, {
-          stepCount,
-          stepGoal,
-        });
-      }
-    };
-
-    syncSteps();
-  }, [stepCount, stepGoal, userId]);
+  // Cleanup when component unmounts
+  return () => {
+    if (subscription) subscription.remove();
+  };
+}, []);
 
   const handleSetGoal = () => {
     const numericGoal = Number(inputGoal);
