@@ -14,6 +14,9 @@ import {
 import { Pedometer } from "expo-sensors";
 import CircularProgress from "react-native-circular-progress-indicator";
 
+
+import { Platform } from "react-native"; // add this at the top with other imports
+
 export default function Steps() {
   const [PedometerAvailability, setPedometerAvailability] = useState("");
   const [stepCount, updateStepCount] = useState(0);
@@ -29,13 +32,19 @@ export default function Steps() {
     1609.34
   ).toFixed(2); // Convert to miles and round to 2 decimal places
 
-  useEffect(() => {
-    // Subscribe to step count updates
-    const subscription = Pedometer.watchStepCount((result) => {
+  
+
+useEffect(() => {
+  let subscription = null;
+
+  // Only try to use pedometer on native devices
+  if (Platform.OS !== "web") {
+    // Try to subscribe to step updates
+    subscription = Pedometer.watchStepCount((result) => {
       updateStepCount(result.steps);
     });
 
-    // Check if the Pedometer is available on the device
+    // Check if pedometer is available
     Pedometer.isAvailableAsync().then(
       (result) => {
         setPedometerAvailability(String(result));
@@ -44,12 +53,16 @@ export default function Steps() {
         setPedometerAvailability("Error: " + (error.message || "Unknown error"));
       }
     );
+  } else {
+    // For web, skip tracking
+    setPedometerAvailability("Not supported on web");
+  }
 
-    // Cleanup function to unsubscribe from the pedometer
-    return () => {
-      subscription && subscription.remove();
-    };
-  }, []); // Empty dependency array ensures this runs only once
+  // Cleanup when component unmounts
+  return () => {
+    if (subscription) subscription.remove();
+  };
+}, []);
 
   const handleSetGoal = () => {
     const numericGoal = Number(inputGoal);

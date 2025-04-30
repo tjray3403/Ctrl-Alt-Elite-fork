@@ -1,6 +1,21 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+  logoContainer: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    alignItems: "center",
+    zIndex: 10,
+  },
+  logoImage: {
+    width: 80,
+    height: 40,
+  },
+  logoText: {
+    fontSize: 12,
+    color: "#333",
+  },
   container: {
     flexGrow: 1,
     justifyContent: "center",

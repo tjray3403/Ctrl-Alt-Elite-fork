@@ -61,7 +61,7 @@ const Weather = () => {
   const getBackgroundImage = (description: string | null) => {
     const desc = description?.toLowerCase();
     if (isDaytime()) {
-      return require("@/assets/backgrounds/night.png");
+      return require("@/assets/backgrounds/clear.png");
     } else if (desc?.includes("clear"))
       return require("@/assets/backgrounds/clear.png");
     else if (desc?.includes("cloud"))

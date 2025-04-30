@@ -7,6 +7,7 @@ import {
   Alert,
   ScrollView,
   Image,
+  StyleSheet,
 } from "react-native";
 import {
   getAuth,
@@ -18,7 +19,6 @@ import {
 import { useRouter } from "expo-router";
 import { db } from "../../config/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { styles } from "../../config/styles";
 
 export default function ProfileScreen() {
   const auth = getAuth();
@@ -32,40 +32,45 @@ export default function ProfileScreen() {
     weight: "",
   });
 
-  // State for updating info
   const [newName, setNewName] = useState("");
   const [newDOB, setNewDOB] = useState("");
   const [newWeight, setNewWeight] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
-  // Toggle for showing the Edit Profile section
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (!userId) {
-      router.replace("/auth/login");
+    if (typeof window !== "undefined" && !userId) {
+      // Avoid crashing by waiting until routing is ready
+      setTimeout(() => {
+        router.replace("/auth/login");
+      }, 0);
       return;
     }
 
-    const fetchUser = async () => {
-      try {
-        const docRef = doc(db, "users", userId);
-        const docSnap = await getDoc(docRef);
+    if (userId) {
+      const fetchUser = async () => {
+        try {
+          const docRef = doc(db, "users", userId);
+          const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          setUserData(docSnap.data() as {
-            name: string;
-            dob: string;
-            weight: string;
-          });
+          if (docSnap.exists()) {
+            setUserData(
+              docSnap.data() as {
+                name: string;
+                dob: string;
+                weight: string;
+              }
+            );
+          }
+        } catch (error) {
+          console.error("❌ Firestore Fetch Error:", error);
         }
-      } catch (error) {
-        console.error("❌ Firestore Fetch Error:", error);
-      }
-    };
+      };
 
-    fetchUser();
+      fetchUser();
+    }
   }, [userId]);
 
   const updateUser = async () => {
@@ -141,6 +146,16 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {/* Panther Pace Logo */}
+      <View style={styles.logoContainer}>
+        <Image
+          source={require("../../assets/images/panther-pace-logo-clear.png")} // Adjust path if needed
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
+        
+      </View>
+
       <View style={styles.container}>
         {!isEditing ? (
           <>
@@ -148,9 +163,7 @@ export default function ProfileScreen() {
               source={{ uri: "https://via.placeholder.com/150" }}
               style={styles.profileImage}
             />
-            <Text style={styles.profileName}>
-              {userData.name || "User"}
-            </Text>
+            <Text style={styles.profileName}>{userData.name || "User"}</Text>
             <Text style={styles.profileInfo}>
               🎂 Age: {userData.dob || "--"}
             </Text>
@@ -165,7 +178,6 @@ export default function ProfileScreen() {
               <Text style={styles.buttonText}>Edit Profile</Text>
             </TouchableOpacity>
 
-            {/* ✅ Minimal Settings Link */}
             <TouchableOpacity
               onPress={() => router.push("/settings")}
               style={styles.linkButton}
@@ -203,10 +215,7 @@ export default function ProfileScreen() {
               placeholder="Enter Weight (lbs)"
               keyboardType="numeric"
             />
-            <TouchableOpacity
-              onPress={updateUser}
-              style={styles.primaryButton}
-            >
+            <TouchableOpacity onPress={updateUser} style={styles.primaryButton}>
               <Text style={styles.buttonText}>Save Changes</Text>
             </TouchableOpacity>
 
@@ -243,3 +252,103 @@ export default function ProfileScreen() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 50,
+  },
+  container: {
+    marginTop: 60,
+    alignItems: "center",
+  },
+  logoContainer: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    alignItems: "center",
+    zIndex: 10,
+  },
+  logoImage: {
+    width: 80,
+    height: 40,
+  },
+  logoText: {
+    fontSize: 12,
+    color: "#333",
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 15,
+    borderWidth: 3,
+    borderColor: "#6200EE",
+  },
+  profileName: {
+    fontSize: 22,
+    fontWeight: "700",
+    textAlign: "center",
+    color: "#6200EE",
+    marginBottom: 5,
+  },
+  profileInfo: {
+    fontSize: 16,
+    color: "#555",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginVertical: 6,
+    fontSize: 16,
+    width: "100%",
+  },
+  primaryButton: {
+    backgroundColor: "#6200EE",
+    padding: 12,
+    borderRadius: 10,
+    marginVertical: 8,
+    alignItems: "center",
+    width: "100%",
+  },
+  secondaryButton: {
+    backgroundColor: "#03DAC6",
+    padding: 12,
+    borderRadius: 10,
+    marginVertical: 8,
+    alignItems: "center",
+    width: "100%",
+  },
+  logoutButton: {
+    backgroundColor: "#B00020",
+    padding: 12,
+    borderRadius: 10,
+    marginVertical: 8,
+    alignItems: "center",
+    width: "100%",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  linkButton: {
+    marginVertical: 8,
+    alignItems: "center",
+  },
+  linkText: {
+    color: "#6200EE",
+    fontSize: 16,
+    textDecorationLine: "underline",
+  },
+});
