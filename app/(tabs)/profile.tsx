@@ -19,6 +19,7 @@ import {
 import { useRouter } from "expo-router";
 import { db } from "../../config/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { styles } from "../../config/styles";
 
 export default function ProfileScreen() {
   const auth = getAuth();
@@ -253,6 +254,8 @@ export default function ProfileScreen() {
   );
 }
 
+
+/*
 const styles = StyleSheet.create({
   scrollContainer: {
     padding: 20,
@@ -352,3 +355,4 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+*/
