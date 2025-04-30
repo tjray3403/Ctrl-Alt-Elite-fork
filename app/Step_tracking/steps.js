@@ -13,52 +13,79 @@ import {
 } from "react-native";
 import { Pedometer } from "expo-sensors";
 import CircularProgress from "react-native-circular-progress-indicator";
+import { auth, db } from "../../config/firebase";
+import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { format } from "date-fns";
 
 export default function Steps() {
   const [PedometerAvailability, setPedometerAvailability] = useState("");
   const [stepCount, updateStepCount] = useState(0);
-  const [stepGoal, setStepGoal] = useState(10000); // Default goal is 10,000 steps
-  const [inputGoal, setInputGoal] = useState(""); // Temporary state for user input
+  const [stepGoal, setStepGoal] = useState(10000);
+  const [inputGoal, setInputGoal] = useState("");
+  const [userId, setUserId] = useState("");
 
-  // Approximate step length in meters
   const stepLengthInMeters = 0.762;
-
-  // Calculate distance covered in miles
   const distanceCoveredInMiles = (
-    (stepCount * stepLengthInMeters) /
-    1609.34
-  ).toFixed(2); // Convert to miles and round to 2 decimal places
+    (stepCount * stepLengthInMeters) / 1609.34
+  ).toFixed(2);
 
+  // Get current logged-in user
   useEffect(() => {
-    // Subscribe to step count updates
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) setUserId(user.uid);
+    });
+    return unsubscribe;
+  }, []);
+
+  // Pedometer subscription
+  useEffect(() => {
     const subscription = Pedometer.watchStepCount((result) => {
       updateStepCount(result.steps);
     });
 
-    // Check if the Pedometer is available on the device
     Pedometer.isAvailableAsync().then(
-      (result) => {
-        setPedometerAvailability(String(result));
-      },
-      (error) => {
-        setPedometerAvailability("Error: " + (error.message || "Unknown error"));
-      }
+      (result) => setPedometerAvailability(String(result)),
+      (error) => setPedometerAvailability("Error: " + error?.message)
     );
 
-    // Cleanup function to unsubscribe from the pedometer
     return () => {
       subscription && subscription.remove();
     };
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
+
+  // Firestore Sync
+  useEffect(() => {
+    if (!userId) return;
+    const date = format(new Date(), "yyyy-MM-dd");
+    const ref = doc(db, "users", userId, "dailyStats", date);
+
+    const syncSteps = async () => {
+      const snapshot = await getDoc(ref);
+      if (snapshot.exists()) {
+        await updateDoc(ref, {
+          stepCount,
+          stepGoal,
+        });
+      } else {
+        await setDoc(ref, {
+          stepCount,
+          stepGoal,
+        });
+      }
+    };
+
+    syncSteps();
+  }, [stepCount, stepGoal, userId]);
 
   const handleSetGoal = () => {
     const numericGoal = Number(inputGoal);
     if (isNaN(numericGoal) || numericGoal <= 0) {
-      Alert.alert("Invalid Input", "Please enter a valid positive number for the step goal.");
+      Alert.alert("Invalid Input", "Enter a valid number for the step goal.");
     } else {
       setStepGoal(numericGoal);
-      Alert.alert("Step Goal Updated", `Your new step goal is ${numericGoal} steps.`);
-      Keyboard.dismiss(); // Dismiss the keyboard after setting the goal
+      Alert.alert("Step Goal Updated", `New step goal: ${numericGoal}`);
+      Keyboard.dismiss();
     }
   };
 
@@ -66,36 +93,33 @@ export default function Steps() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <Text style={styles.text}>Step Tracker!</Text>
-        <View>
-          <CircularProgress
-            value={stepCount}
-            maxValue={stepGoal} // Dynamically set the goal
-            radius={100}
-            textColor={"#000"}
-            activeStrokeColor={"#96ef7a"} // Color of the progress indicator
-            inActiveStrokeColor={"#d3d3d3"} // Gray for inactive progress
-            inActiveStrokeOpacity={0.5}
-            activeStrokeWidth={15}
-            inActiveStrokeWidth={15}
-          >
-            {/* Image in the center of the progress circle */}
-            <Image
-              source={require("../../assets/images/running-fast.png")}
-              style={styles.image}
-              resizeMode="contain"
-            />
-          </CircularProgress>
-        </View>
+        <CircularProgress
+          value={stepCount}
+          maxValue={stepGoal}
+          radius={100}
+          textColor={"#000"}
+          activeStrokeColor={"#96ef7a"}
+          inActiveStrokeColor={"#d3d3d3"}
+          inActiveStrokeOpacity={0.5}
+          activeStrokeWidth={15}
+          inActiveStrokeWidth={15}
+        >
+          <Image
+            source={require("../../assets/images/running-fast.png")}
+            style={styles.image}
+            resizeMode="contain"
+          />
+        </CircularProgress>
         <Text style={styles.text}>Steps: {stepCount}</Text>
         <Text style={styles.text}>Goal: {stepGoal} steps</Text>
-        <Text style={styles.text}>Distance Covered: {distanceCoveredInMiles} miles</Text>
+        <Text style={styles.text}>Distance: {distanceCoveredInMiles} miles</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter your step goal"
           keyboardType="numeric"
           value={inputGoal}
-          onChangeText={(text) => setInputGoal(text)} // Update the temporary input state
-          onSubmitEditing={Keyboard.dismiss} // Dismiss the keyboard when the user presses "Done"
+          onChangeText={setInputGoal}
+          onSubmitEditing={Keyboard.dismiss}
         />
         <Button title="Set Step Goal" onPress={handleSetGoal} />
         <StatusBar style="dark" />
@@ -105,19 +129,8 @@ export default function Steps() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center", // Center the circle in the screen
-    backgroundColor: "#fff",
-  },
-  text: {
-    fontSize: 16,
-    color: "#000",
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 10,
-  },
+  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" },
+  text: { fontSize: 16, color: "#000", fontWeight: "bold", textAlign: "center", marginVertical: 10 },
   input: {
     height: 40,
     borderColor: "#6A0DAD",
@@ -128,9 +141,5 @@ const styles = StyleSheet.create({
     width: "80%",
     textAlign: "center",
   },
-  image: {
-    width: 80, // Adjust the size of the image
-    height: 80,
-  },
+  image: { width: 80, height: 80 },
 });
-
