@@ -1,27 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert, Image } from "react-native"; // Import Image from react-native
+import { View, Text, TextInput, Button, StyleSheet, Alert, Image, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Progress from 'react-native-progress';
+import * as Progress from "react-native-progress";
+import { auth, db } from "../../config/firebase";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { format } from "date-fns";
 
 const WaterTracking = () => {
   const [totalWater, setTotalWater] = useState<number>(0);
   const [inputValue, setInputValue] = useState<string>("");
   const [goalInput, setGoalInput] = useState<string>("");
-  const [dailyGoal, setDailyGoal] = useState<number>(2); // Default to 2 liters
+  const [dailyGoal, setDailyGoal] = useState<number>(2);
+  const [userId, setUserId] = useState("");
 
-  // Load data from AsyncStorage when component mounts
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) setUserId(user.uid);
+    });
+    return unsubscribe;
+  }, []);
+
   useEffect(() => {
     const loadData = async () => {
       try {
         const savedWater = await AsyncStorage.getItem("totalWater");
         const savedGoal = await AsyncStorage.getItem("dailyGoal");
 
-        if (savedWater !== null) {
-          setTotalWater(parseFloat(savedWater));
-        }
-        if (savedGoal !== null) {
-          setDailyGoal(parseFloat(savedGoal));
-        }
+        if (savedWater !== null) setTotalWater(parseFloat(savedWater));
+        if (savedGoal !== null) setDailyGoal(parseFloat(savedGoal));
       } catch (error) {
         console.error("Error loading data:", error);
       }
@@ -30,7 +37,29 @@ const WaterTracking = () => {
     loadData();
   }, []);
 
-  // Save water data to AsyncStorage
+  useEffect(() => {
+    if (!userId) return;
+    const date = format(new Date(), "yyyy-MM-dd");
+    const ref = doc(db, "users", userId, "dailyStats", date);
+
+    const syncWater = async () => {
+      const snapshot = await getDoc(ref);
+      if (snapshot.exists()) {
+        await updateDoc(ref, {
+          waterIntake: totalWater,
+          waterGoal: dailyGoal,
+        });
+      } else {
+        await setDoc(ref, {
+          waterIntake: totalWater,
+          waterGoal: dailyGoal,
+        });
+      }
+    };
+
+    syncWater();
+  }, [totalWater, dailyGoal, userId]);
+
   const saveWaterData = async (newTotal: number) => {
     try {
       await AsyncStorage.setItem("totalWater", newTotal.toString());
@@ -39,7 +68,6 @@ const WaterTracking = () => {
     }
   };
 
-  // Save goal data to AsyncStorage
   const saveGoalData = async (newGoal: number) => {
     try {
       await AsyncStorage.setItem("dailyGoal", newGoal.toString());
@@ -48,7 +76,6 @@ const WaterTracking = () => {
     }
   };
 
-  // Handle adding water
   const addWater = () => {
     const parsedValue = parseFloat(inputValue);
     if (!isNaN(parsedValue) && parsedValue > 0) {
@@ -57,116 +84,96 @@ const WaterTracking = () => {
       saveWaterData(newTotal);
       setInputValue("");
     } else {
-      Alert.alert("Invalid Input", "Please enter a valid number greater than 0.");
+      Alert.alert("Invalid Input", "Enter a number greater than 0.");
     }
   };
 
-  // Handle subtracting water
   const subtractWater = () => {
     const parsedValue = parseFloat(inputValue);
     if (!isNaN(parsedValue) && parsedValue > 0) {
-      const newTotal = Math.max(totalWater - parsedValue, 0); // Ensure totalWater doesn't go below 0
+      const newTotal = Math.max(totalWater - parsedValue, 0);
       setTotalWater(newTotal);
       saveWaterData(newTotal);
       setInputValue("");
     } else {
-      Alert.alert("Invalid Input", "Please enter a valid number greater than 0.");
+      Alert.alert("Invalid Input", "Enter a number greater than 0.");
     }
   };
 
-  // Set a new daily goal
   const setGoal = () => {
     const parsedGoal = parseFloat(goalInput);
     if (!isNaN(parsedGoal) && parsedGoal > 0) {
       setDailyGoal(parsedGoal);
       saveGoalData(parsedGoal);
       setGoalInput("");
-      Alert.alert("Goal Set", `Your daily goal is now ${parsedGoal} liters.`);
+      Alert.alert("Goal Set", `Daily goal set to ${parsedGoal} liters.`);
     } else {
-      Alert.alert("Invalid Goal", "Please enter a valid number greater than 0.");
+      Alert.alert("Invalid Goal", "Enter a valid number greater than 0.");
     }
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Water Tracker</Text>
 
-      {/* Progress Bar */}
       <View style={styles.progressContainer}>
-        <Text style={styles.totalText}>
-          Total Water Consumed Today: {totalWater.toFixed(2)} Ounces
-        </Text>
-        <View style={styles.progressWrapper}>
-          <Progress.Circle
-            progress={Math.min(totalWater / dailyGoal, 1)} // Ensure progress doesn't exceed 1
-            size={180} // Adjust the size of the circle
-            thickness={8} // Adjust the thickness of the circle
-            color="#3b9d9b"
-            borderWidth={0}
-            showsText={false} // Disable default text inside the circle
-          />
-          {/* Add the image in the center */}
-          <Image
-            source={require("../../assets/images/water.jpg")} // Replace with your image path
-            style={styles.progressImage}
-          />
-        </View>
-        <Text style={styles.goalText}>
-          {totalWater.toFixed(2)} / {dailyGoal} Ounces
-        </Text>
-        {totalWater >= dailyGoal && (
-          <Text style={styles.congratsText}>You met your water intake goal!🎉</Text>
-        )}
+      <Text style={styles.totalText}>
+        Total Water Today: {totalWater.toFixed(2)} Ounces
+      </Text>
+      <View style={styles.progressWrapper}>
+        <Progress.Circle
+        progress={Math.min(totalWater / dailyGoal, 1)}
+        size={180}
+        thickness={8}
+        color="#3b9d9b"
+        borderWidth={0}
+        showsText={false}
+        />
+        <Image
+        source={require("../../assets/images/panther_water.png")}
+        style={styles.progressImage}
+        />
+      </View>
+      <Text style={styles.goalText}>
+        {totalWater.toFixed(2)} / {dailyGoal} Ounces
+      </Text>
+      {totalWater >= dailyGoal && (
+        <Text style={styles.congratsText}>You met your water goal! 🎉</Text>
+      )}
       </View>
 
-      {/* Set Daily Goal Section */}
       <Text style={styles.subtitle}>Set Your Daily Goal (Ounces)</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Enter your daily goal"
-        keyboardType="numeric"
-        value={goalInput}
-        onChangeText={setGoalInput}
-        returnKeyType="done" // Adds a "Done" button on iOS
-        onSubmitEditing={setGoal} // Calls the setGoal function when "Done" is pressed
+      style={styles.input}
+      placeholder="Enter your daily goal"
+      keyboardType="numeric"
+      value={goalInput}
+      onChangeText={setGoalInput}
+      returnKeyType="done"
+      onSubmitEditing={setGoal}
       />
       <Button title="Set Goal" onPress={setGoal} />
 
-      {/* Add Water Section */}
       <Text style={styles.subtitle}>Track Your Water Intake</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Enter water in liters (e.g., 0.5)"
-        keyboardType="numeric"
-        value={inputValue}
-        onChangeText={setInputValue}
-        returnKeyType="done" // Adds a "Done" button on iOS
-        onSubmitEditing={addWater} // Calls the addWater function when "Done" is pressed
+      style={styles.input}
+      placeholder="Enter water in ounces (e.g., 8)"
+      keyboardType="numeric"
+      value={inputValue}
+      onChangeText={setInputValue}
+      returnKeyType="done"
+      onSubmitEditing={addWater}
       />
       <Button title="Add Water" onPress={addWater} />
-      <Button title="Subtract Water" onPress={subtractWater} /> {/* New button */}
-      
-    </View>
+      <Button title="Subtract Water" onPress={subtractWater} />
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f2f2f2",
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontSize: 18,
-    marginBottom: 15,
-  },
+  container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20, backgroundColor: "#f2f2f2" },
+  title: { fontSize: 30, fontWeight: "bold", marginBottom: 20 },
+  subtitle: { fontSize: 18, marginBottom: 15 },
   input: {
     width: "80%",
     padding: 10,
@@ -175,38 +182,17 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 5,
   },
-  progressContainer: {
-    marginTop: 20,
-    width: "80%",
-    alignItems: "center",
-  },
-  progressWrapper: {
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  progressContainer: { marginTop: 20, width: "80%", alignItems: "center" },
+  progressWrapper: { position: "relative", justifyContent: "center", alignItems: "center" },
   progressImage: {
-    position: "absolute", // Overlay the image in the center
-    width: 165, // Slightly smaller than the circle size (100 - 2 * thickness)
-    height: 165, // Match the width for a square image
-    borderRadius: 100, // Make the image circular (half of the width/height)
+    position: "absolute",
+    width: 165,
+    height: 165,
+    borderRadius: 100,
   },
-  totalText: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 5,
-  },
-  goalText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#3b9d9b",
-  },
-  congratsText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#3b9d9b",
-    marginTop: 10,
-  },
+  totalText: { fontSize: 18, fontWeight: "600", marginBottom: 5 },
+  goalText: { fontSize: 16, fontWeight: "600", color: "#3b9d9b" },
+  congratsText: { fontSize: 16, fontWeight: "600", color: "#3b9d9b", marginTop: 10 },
 });
 
 export default WaterTracking;

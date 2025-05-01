@@ -61,7 +61,7 @@ const Weather = () => {
   const getBackgroundImage = (description: string | null) => {
     const desc = description?.toLowerCase();
     if (isDaytime()) {
-      return require("@/assets/backgrounds/night.png");
+      return require("@/assets/backgrounds/clear.png");
     } else if (desc?.includes("clear"))
       return require("@/assets/backgrounds/clear.png");
     else if (desc?.includes("cloud"))
@@ -133,7 +133,7 @@ const Weather = () => {
             // If it's a new day, save the last day's forecast and reset
             if (currentDate !== null) {
               dailyForecast.push({
-                date: item.dt ? new Date(item.dt * 1000).toDateString() : "Invalid Date",
+                date: new Date(item.dt * 1000).toDateString(),
                 high: dailyHigh,
                 low: dailyLow,
               });

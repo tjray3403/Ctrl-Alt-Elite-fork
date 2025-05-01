@@ -121,7 +121,15 @@ export default function HomeScreen() {
       />
       <Text style={styles.greeting}>Hi, {userName || "Student"}!</Text>
       <Link href="/" style={{ width: "100%", alignItems: "center" }}>
-        <View style={{ width: "100%", flexDirection: "row", gap: 10, justifyContent: "space-between", padding: 10 }}>
+        <View
+          style={{
+            width: "100%",
+            flexDirection: "row",
+            gap: 10,
+            justifyContent: "space-between",
+            padding: 10,
+          }}
+        >
           <Text
             style={{ alignSelf: "flex-start", fontSize: 16, fontWeight: 500 }}
           >
@@ -168,10 +176,10 @@ export default function HomeScreen() {
           >
             <Image
               //source={
-                //nextClass.imageUrl
+              //nextClass.imageUrl
               //    ? { uri: nextClass.imageUrl }
-                  //: require("@/pantherpace_logo.jpg")
-           //   }
+              //: require("@/pantherpace_logo.jpg")
+              //   }
               style={styles.classImage}
             />
             <View style={styles.classInfoContainer}>
@@ -242,7 +250,7 @@ export default function HomeScreen() {
         <View style={{ gap: 20 }}>
           <View>
             <Text style={styles.containerButtonText}>Weather</Text>
-            <Link style={styles.tileStyle} href={"/other/weather"}>
+            <Link style={styles.tileStyle} href={"/(tabs)/weather"}>
               <Image
                 source={require("../../assets/images/sunny-day.png")}
                 style={[
