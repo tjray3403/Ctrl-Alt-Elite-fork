@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert, Image } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert, Image, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Progress from "react-native-progress";
 import { auth, db } from "../../config/firebase";
@@ -113,60 +113,60 @@ const WaterTracking = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Water Tracker</Text>
 
       <View style={styles.progressContainer}>
-        <Text style={styles.totalText}>
-          Total Water Today: {totalWater.toFixed(2)} Ounces
-        </Text>
-        <View style={styles.progressWrapper}>
-          <Progress.Circle
-            progress={Math.min(totalWater / dailyGoal, 1)}
-            size={180}
-            thickness={8}
-            color="#3b9d9b"
-            borderWidth={0}
-            showsText={false}
-          />
-          <Image
-            source={require("../../assets/images/panther_water.png")}
-            style={styles.progressImage}
-          />
-        </View>
-        <Text style={styles.goalText}>
-          {totalWater.toFixed(2)} / {dailyGoal} Ounces
-        </Text>
-        {totalWater >= dailyGoal && (
-          <Text style={styles.congratsText}>You met your water goal! 🎉</Text>
-        )}
+      <Text style={styles.totalText}>
+        Total Water Today: {totalWater.toFixed(2)} Ounces
+      </Text>
+      <View style={styles.progressWrapper}>
+        <Progress.Circle
+        progress={Math.min(totalWater / dailyGoal, 1)}
+        size={180}
+        thickness={8}
+        color="#3b9d9b"
+        borderWidth={0}
+        showsText={false}
+        />
+        <Image
+        source={require("../../assets/images/panther_water.png")}
+        style={styles.progressImage}
+        />
+      </View>
+      <Text style={styles.goalText}>
+        {totalWater.toFixed(2)} / {dailyGoal} Ounces
+      </Text>
+      {totalWater >= dailyGoal && (
+        <Text style={styles.congratsText}>You met your water goal! 🎉</Text>
+      )}
       </View>
 
       <Text style={styles.subtitle}>Set Your Daily Goal (Ounces)</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Enter your daily goal"
-        keyboardType="numeric"
-        value={goalInput}
-        onChangeText={setGoalInput}
-        returnKeyType="done"
-        onSubmitEditing={setGoal}
+      style={styles.input}
+      placeholder="Enter your daily goal"
+      keyboardType="numeric"
+      value={goalInput}
+      onChangeText={setGoalInput}
+      returnKeyType="done"
+      onSubmitEditing={setGoal}
       />
       <Button title="Set Goal" onPress={setGoal} />
 
       <Text style={styles.subtitle}>Track Your Water Intake</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Enter water in ounces (e.g., 8)"
-        keyboardType="numeric"
-        value={inputValue}
-        onChangeText={setInputValue}
-        returnKeyType="done"
-        onSubmitEditing={addWater}
+      style={styles.input}
+      placeholder="Enter water in ounces (e.g., 8)"
+      keyboardType="numeric"
+      value={inputValue}
+      onChangeText={setInputValue}
+      returnKeyType="done"
+      onSubmitEditing={addWater}
       />
       <Button title="Add Water" onPress={addWater} />
       <Button title="Subtract Water" onPress={subtractWater} />
-    </View>
+    </ScrollView>
   );
 };
 

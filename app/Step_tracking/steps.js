@@ -48,14 +48,13 @@ export default function Steps() {
     });
 
     // Check if pedometer is available
-    Pedometer.isAvailableAsync().then(
-      (result) => setPedometerAvailability(String(result)),
-      (error) => setPedometerAvailability("Error: " + error?.message)
-    );
-  } else {
+  Pedometer.isAvailableAsync().then(
+    (result) => setPedometerAvailability(String(result)),
+    (error) => setPedometerAvailability("Error: " + error?.message)
+  ).catch(() => {
     // For web, skip tracking
     setPedometerAvailability("Not supported on web");
-  }
+  });
 
   // Cleanup when component unmounts
   return () => {

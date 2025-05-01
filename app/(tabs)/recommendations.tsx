@@ -1,7 +1,7 @@
 import { styles } from "../../config/styles";
 import React, { useState, useEffect } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
-
+import { format } from "date-fns";
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import {
   onSnapshot,
   serverTimestamp,
   DocumentReference, 
+  doc,
+  getDoc,
   getDocs, 
   deleteDoc,
 } from "firebase/firestore";
@@ -45,6 +47,8 @@ const TypingEffect: React.FC<{ text?: string }> = ({ text = "" }) => {
 const RecommendationScreen: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [mood, setMood] = useState("");
+  const [water, setWater] = useState<number>(0);
+  const [water_goal, setWaterGoal] = useState<number>(0);
   const [suggestion, setSuggestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [chats, setChats] = useState<{ mood: string; suggestion: string }[]>(
@@ -94,7 +98,7 @@ const RecommendationScreen: React.FC = () => {
     try {
       const res = await axios.post(
         "https://tjray3403-pantherrecommendation.hf.space/suggest",
-        { mood }
+        { mood , water, water_goal}
       );
       console.log("API response:", res.data);
       const newSug = `${res.data.suggested_activity}. ${res.data.additional_note}`;
@@ -115,6 +119,30 @@ const RecommendationScreen: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchWaterStats = async () => {
+      if (!user) return;
+  
+      const today = format(new Date(), "yyyy-MM-dd"); // e.g., 2025-04-30
+      const statRef = doc(db, "users", user.uid, "dailyStats", today);
+  
+      try {
+        const docSnap = await getDoc(statRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setWater(parseFloat(data.waterIntake) || 0);
+          setWaterGoal(parseFloat(data.waterGoal) || 200);
+          console.log("✅ Fetched water data:", data);
+        } else {
+          console.log("No water stats for today");
+        }
+      } catch (err) {
+        console.error("Error fetching water stats:", err);
+      }
+    };
+  
+    fetchWaterStats();
+  }, [user]);
 
   const deleteDocByRef = async (docRef: DocumentReference) => {
     try {
